@@ -7,18 +7,22 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { CustomerModule } from "./features/customers/customer.module";
 import { HttpClientModule } from "@angular/common/http";
+import {MatSidenavModule} from "@angular/material/sidenav";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
 @NgModule({
   declarations: [
     AppComponent
   ],
   imports: [
+    BrowserAnimationsModule,
     BrowserModule,
     AppRoutingModule,
     StoreModule.forRoot({}, {}),
     EffectsModule.forRoot([]),
     CustomerModule,
-    HttpClientModule
+    HttpClientModule,
+    MatSidenavModule
   ],
   providers: [],
   bootstrap: [AppComponent]
