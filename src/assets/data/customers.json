@@ -1,9 +1,8 @@
 [
   {
     "id": "cust-001",
-    "fullName": "Lerato Mokoena",
-    "email": "lerato.mokoena@example.com",
-    "phone": "+27 82 123 4567",
+    "firstName": "Lerato",
+    "lastName": "Mokoena",
     "addresses": [
       {
         "id": "addr-001",
@@ -21,9 +20,8 @@
   },
   {
     "id": "cust-002",
-    "fullName": "Thabo Nkosi",
-    "email": "thabo.nkosi@example.com",
-    "phone": "+27 73 987 6543",
+    "firstName": "Thabo",
+    "lastName": "Nkosi",
     "addresses": [
       {
         "id": "addr-003",
@@ -35,9 +33,8 @@
   },
   {
     "id": "cust-003",
-    "fullName": "Nandi Khumalo",
-    "email": "nandi.khumalo@example.com",
-    "phone": "+27 61 555 1122",
+    "firstName": "Nandi",
+    "lastName": "Khumalo",
     "addresses": []
   }
 ]
