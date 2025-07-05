@@ -1,0 +1,37 @@
+import { createReducer, on } from '@ngrx/store';
+import { Customer } from '../models/customer.model';
+import * as CustomerActions from './customer.actions';
+
+export interface CustomerState {
+  customers: Customer[];
+  loading: boolean;
+  error: any;
+}
+
+export const initialState: CustomerState = {
+  customers: [],
+  loading: false,
+  error: null
+};
+
+export const customerReducer = createReducer(
+  initialState,
+  on(CustomerActions.loadCustomers, state => ({ ...state, loading: true })),
+  on(CustomerActions.loadCustomersSuccess, (state, { customers }) => ({ ...state, loading: false, customers })),
+  on(CustomerActions.loadCustomersFailure, (state, { error }) => ({ ...state, loading: false, error })),
+
+  on(CustomerActions.addCustomerSuccess, (state, { customer }) => ({
+    ...state,
+    customers: [...state.customers, customer]
+  })),
+
+  on(CustomerActions.updateCustomerSuccess, (state, { customer }) => ({
+    ...state,
+    customers: state.customers.map(c => c.id === customer.id ? customer : c)
+  })),
+
+  on(CustomerActions.deleteCustomerSuccess, (state, { customerId }) => ({
+    ...state,
+    customers: state.customers.filter(c => c.id !== customerId)
+  }))
+);
