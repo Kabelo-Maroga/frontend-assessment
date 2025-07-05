@@ -1,0 +1,43 @@
+[
+  {
+    "id": "cust-001",
+    "fullName": "Lerato Mokoena",
+    "email": "lerato.mokoena@example.com",
+    "phone": "+27 82 123 4567",
+    "addresses": [
+      {
+        "id": "addr-001",
+        "street": "123 Main Street",
+        "city": "Johannesburg",
+        "postalCode": "2001"
+      },
+      {
+        "id": "addr-002",
+        "street": "456 Second Avenue",
+        "city": "Pretoria",
+        "postalCode": "0002"
+      }
+    ]
+  },
+  {
+    "id": "cust-002",
+    "fullName": "Thabo Nkosi",
+    "email": "thabo.nkosi@example.com",
+    "phone": "+27 73 987 6543",
+    "addresses": [
+      {
+        "id": "addr-003",
+        "street": "789 Third Road",
+        "city": "Cape Town",
+        "postalCode": "8001"
+      }
+    ]
+  },
+  {
+    "id": "cust-003",
+    "fullName": "Nandi Khumalo",
+    "email": "nandi.khumalo@example.com",
+    "phone": "+27 61 555 1122",
+    "addresses": []
+  }
+]
