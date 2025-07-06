@@ -1,5 +1,10 @@
 <div class="customer-details-container" *ngIf="selectedCustomer$ | async as customer">
-  <h3>Customer Details</h3>
+  <div class="header">
+    <h3>Customer Details</h3>
+    <button mat-icon-button class="close-button" (click)="onClose()" matTooltip="Close details">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
   <div class="detail-item">
     <div class="label">First Name</div>

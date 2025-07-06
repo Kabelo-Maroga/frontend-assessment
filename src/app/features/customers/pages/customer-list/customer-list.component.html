@@ -95,7 +95,7 @@
     </div>
 
     <div class="details-container mat-elevation-z8" *ngIf="selectedCustomer$ | async">
-      <app-customer-details></app-customer-details>
+      <app-customer-details (close)="onCloseDetails()"></app-customer-details>
     </div>
   </div>
 </div>

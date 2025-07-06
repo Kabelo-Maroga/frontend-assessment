@@ -66,6 +66,10 @@ export class CustomerListComponent extends SafeUnsubscribe implements OnInit {
     this.customerFacade.selectedCustomer(customer);
   }
 
+  onCloseDetails(): void {
+    this.customerFacade.selectedCustomer(undefined);
+  }
+
   private filterCustomers(): void {
     this.filteredCustomers$ = combineLatest([this.customerFacade.customers$, this.searchSubject$.asObservable()])
       .pipe(
