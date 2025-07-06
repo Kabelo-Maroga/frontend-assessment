@@ -14,6 +14,10 @@ export class CustomerFormComponent {
     this.form = this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
+      street: ['', Validators.required],
+      city: ['', Validators.required],
+      suburb: ['', Validators.required],
+      postalCode: ['', Validators.required]
     });
   }
 
@@ -23,7 +27,12 @@ export class CustomerFormComponent {
         id: `#1-${this.form.value.firstName}`,
         firstName: this.form.value.firstName,
         lastName: this.form.value.lastName,
-        addresses: []
+        addresses: [{
+          street: this.form.value.street,
+          city: this.form.value.city,
+          suburb: this.form.value.suburb,
+          postalCode: this.form.value.postalCode
+        }]
       };
       this.customerFacade.addCustomer(newCustomer);
       this.form.reset();

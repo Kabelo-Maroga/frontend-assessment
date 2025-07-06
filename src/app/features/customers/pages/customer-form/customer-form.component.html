@@ -11,6 +11,26 @@
       <input matInput formControlName="lastName" required />
     </mat-form-field>
 
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Street</mat-label>
+      <input matInput formControlName="street" required />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>City</mat-label>
+      <input matInput formControlName="city" required />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Suburb</mat-label>
+      <input matInput formControlName="suburb" required />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Postal Code</mat-label>
+      <input matInput formControlName="postalCode" required />
+    </mat-form-field>
+
     <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Add Customer</button>
   </form>
 </div>

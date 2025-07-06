@@ -15,8 +15,14 @@
     </ng-container>
 
     <ng-container matColumnDef="addresses">
-      <th mat-header-cell *matHeaderCellDef> Address </th>
-      <td mat-cell *matCellDef="let customer"> {{customer.addresses}} </td>
+      <th mat-header-cell *matHeaderCellDef> Addresses </th>
+      <td mat-cell *matCellDef="let customer">
+        <ul style="margin: 0; padding-left: 1.2rem;">
+          <li *ngFor="let address of customer.addresses">
+            {{ address.city }}, {{ address.postalCode }}
+          </li>
+        </ul>
+      </td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
