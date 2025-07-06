@@ -5,6 +5,7 @@ import { Customer } from '../../../customers/models/customer.model';
 import { Quote, QuoteWithCustomer } from '../../models/quote.model';
 import { NotificationService } from '../../../../shared';
 import { QuoteFacade } from '../../state/quote.facade';
+import { BaseFormComponent } from '../../../../shared/components/base-form.component';
 
 export interface QuoteDialogData {
   quote?: QuoteWithCustomer;
@@ -16,7 +17,7 @@ export interface QuoteDialogData {
   templateUrl: './quote-form.component.html',
   styleUrls: ['./quote-form.component.scss']
 })
-export class QuoteFormComponent implements OnInit {
+export class QuoteFormComponent extends BaseFormComponent implements OnInit {
   form: FormGroup;
   customers$ = this.quoteFacade.getCustomers();
   statusOptions = ['Pending', 'Approved', 'Declined'];
@@ -30,48 +31,27 @@ export class QuoteFormComponent implements OnInit {
     public dialogRef: MatDialogRef<QuoteFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: QuoteDialogData
   ) {
+    super();
     this.isEditMode = data?.isEdit || false;
     this.currentQuote = data?.quote;
-    this.form = this.initializeForm();
+    this.form = this.createForm();
   }
 
   ngOnInit(): void {
-    this.patchForm();
+    if (this.isEditMode && this.currentQuote) {
+      this.patchForm();
+    }
   }
 
   onSubmit(): void {
-    if (!this.form.valid) {
-      this.markFormAsTouched();
-      return;
-    }
+    if (!this.isFormValid()) return;
 
-    const formValue = this.form.value;
-
-    if (this.isEditMode && this.currentQuote) {
-      const updatedQuote: Quote = {
-        ...this.currentQuote,
-        customerId: formValue.customerId,
-        amount: formValue.amount,
-        status: formValue.status,
-        description: formValue.description
-      };
-
-      this.quoteFacade.updateQuote(updatedQuote);
-      this.notificationService.success('Quote updated successfully!');
-      this.dialogRef.close(updatedQuote);
+    const quote = this.buildQuote();
+    
+    if (this.isEditMode) {
+      this.updateQuote(quote);
     } else {
-      const newQuote: Quote = {
-        id: this.generateId("quote"),
-        customerId: formValue.customerId,
-        amount: formValue.amount,
-        status: formValue.status,
-        createdDate: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
-        description: formValue.description
-      };
-
-      this.quoteFacade.addQuote(newQuote);
-      this.notificationService.success('Quote created successfully!');
-      this.dialogRef.close(newQuote);
+      this.createQuote(quote);
     }
   }
 
@@ -83,35 +63,53 @@ export class QuoteFormComponent implements OnInit {
     return `${customer.firstName} ${customer.lastName}`;
   }
 
-  private patchForm(): void {
-    if (this.isEditMode && this.currentQuote) {
-      this.form.patchValue({
-        customerId: this.currentQuote.customerId,
-        description: this.currentQuote.description,
-        amount: this.currentQuote.amount,
-        status: this.currentQuote.status
-      });
-    }
-  }
-
-  private initializeForm(): FormGroup {
+  private createForm(): FormGroup {
     return this.fb.group({
-      customerId: ['', [Validators.required]],
-      description: ['', [Validators.required]],
-      amount: ['', [Validators.required]],
-      status: ['', [Validators.required]]
+      customerId: ['', Validators.required],
+      description: ['', Validators.required],
+      amount: ['', Validators.required],
+      status: ['', Validators.required]
     });
   }
 
-  private generateId(prefix: string): string {
-    const timestamp = Date.now();
-    return `${prefix}-${timestamp}`;
+  private patchForm(): void {
+    this.form.patchValue({
+      customerId: this.currentQuote!.customerId,
+      description: this.currentQuote!.description,
+      amount: this.currentQuote!.amount,
+      status: this.currentQuote!.status
+    });
   }
 
-  private markFormAsTouched(): void {
-    Object.keys(this.form.controls).forEach(key => {
-      const control = this.form.get(key);
-      control?.markAsTouched();
-    });
+  private buildQuote(): Quote {
+    const formValue = this.form.value;
+    const baseQuote = {
+      customerId: formValue.customerId,
+      amount: formValue.amount,
+      status: formValue.status,
+      description: formValue.description
+    };
+
+    if (this.isEditMode && this.currentQuote) {
+      return { ...this.currentQuote, ...baseQuote };
+    }
+
+    return {
+      ...baseQuote,
+      id: this.generateId('quote'),
+      createdDate: new Date().toISOString().split('T')[0]
+    };
+  }
+
+  private updateQuote(quote: Quote): void {
+    this.quoteFacade.updateQuote(quote);
+    this.notificationService.success('Quote updated successfully!');
+    this.dialogRef.close(quote);
+  }
+
+  private createQuote(quote: Quote): void {
+    this.quoteFacade.addQuote(quote);
+    this.notificationService.success('Quote created successfully!');
+    this.dialogRef.close(quote);
   }
 }

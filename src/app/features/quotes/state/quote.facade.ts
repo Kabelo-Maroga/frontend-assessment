@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import * as QuoteActions from './quote.actions';
 import * as QuoteSelectors from './quote.selectors';
-import { Observable, combineLatest } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Quote, QuoteWithCustomer } from '../models/quote.model';
 import { QuoteService } from '../services/quote.service';
@@ -11,11 +11,11 @@ import { QuoteService } from '../services/quote.service';
   providedIn: 'root',
 })
 export class QuoteFacade {
-  quotes$: Observable<Quote[]> = this.store.select(QuoteSelectors.selectAllQuotes);
-  quotesWithCustomers$: Observable<QuoteWithCustomer[]> = this.store.select(QuoteSelectors.selectQuotesWithCustomers);
-  selectedQuote$: Observable<QuoteWithCustomer | undefined> = this.store.select(QuoteSelectors.selectSelectedQuote);
-  loading$: Observable<boolean> = this.store.select(QuoteSelectors.selectQuoteLoading);
-  error$: Observable<any> = this.store.select(QuoteSelectors.selectQuoteError);
+  quotes$ = this.store.select(QuoteSelectors.selectAllQuotes);
+  quotesWithCustomers$ = this.store.select(QuoteSelectors.selectQuotesWithCustomers);
+  selectedQuote$ = this.store.select(QuoteSelectors.selectSelectedQuote);
+  loading$ = this.store.select(QuoteSelectors.selectQuoteLoading);
+  error$ = this.store.select(QuoteSelectors.selectQuoteError);
 
   constructor(private store: Store, private quoteService: QuoteService) {}
 
@@ -43,7 +43,6 @@ export class QuoteFacade {
     this.store.dispatch(QuoteActions.selectQuote({ quote }));
   }
 
-  // Enhanced methods for working with customers
   getQuotesWithCustomers(): Observable<QuoteWithCustomer[]> {
     return this.quoteService.getQuotesWithCustomers();
   }
@@ -56,13 +55,5 @@ export class QuoteFacade {
     return this.getQuotesWithCustomers().pipe(
       map(quotes => quotes.filter(quote => quote.customerId === customerId))
     );
-  }
-
-  getQuotesByCustomerFromStore(customerId: string): Observable<Quote[]> {
-    return this.store.select(QuoteSelectors.selectQuotesByCustomer(customerId));
-  }
-
-  getQuotesByStatusFromStore(status: string): Observable<Quote[]> {
-    return this.store.select(QuoteSelectors.selectQuotesByStatus(status));
   }
 }

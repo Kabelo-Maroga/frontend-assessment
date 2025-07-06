@@ -64,17 +64,17 @@
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef>Actions</th>
       <td mat-cell *matCellDef="let quote">
-        <button 
-          mat-icon-button 
-          color="primary" 
-          (click)="openEditQuoteDialog(quote); $event.stopPropagation()"
+        <button
+          mat-icon-button
+          color="primary"
+          (click)="openEditQuoteDialog(quote)"
           matTooltip="Edit Quote">
           <mat-icon>edit</mat-icon>
         </button>
-        <button 
-          mat-icon-button 
-          color="warn" 
-          (click)="deleteQuote(quote); $event.stopPropagation()"
+        <button
+          mat-icon-button
+          color="warn"
+          (click)="deleteQuote(quote)"
           matTooltip="Delete Quote">
           <mat-icon>delete</mat-icon>
         </button>
@@ -82,8 +82,8 @@
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr 
-      mat-row 
+    <tr
+      mat-row
       *matRowDef="let row; columns: displayedColumns;"
       (click)="onRowClick(row)"
       class="clickable-row"

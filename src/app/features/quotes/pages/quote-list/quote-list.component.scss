@@ -41,6 +41,19 @@
       background-color: rgba(0, 0, 0, 0.04);
     }
   }
+
+  .clickable-row {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+
+    &.selected {
+      background-color: rgba(63, 81, 181, 0.1);
+    }
+  }
 }
 
 .status-badge {

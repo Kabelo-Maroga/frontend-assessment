@@ -70,7 +70,7 @@
               <button
                 mat-icon-button
                 color="accent"
-                (click)="viewCustomerQuotes(customer); $event.stopPropagation()"
+                  (click)="viewCustomerQuotes(customer)"
                 matTooltip="View quotes"
                 aria-label="View customer quotes"
               >
@@ -79,7 +79,7 @@
               <button
                 mat-icon-button
                 color="primary"
-                (click)="editCustomer(customer); $event.stopPropagation()"
+                (click)="editCustomer(customer)"
                 matTooltip="Edit customer"
                 aria-label="Edit customer"
               >
@@ -88,7 +88,7 @@
               <button
                 mat-icon-button
                 color="warn"
-                (click)="deleteCustomer(customer); $event.stopPropagation()"
+                (click)="deleteCustomer(customer)"
                 matTooltip="Delete customer"
                 aria-label="Delete customer"
               >

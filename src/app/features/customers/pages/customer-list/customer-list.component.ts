@@ -6,17 +6,17 @@ import { BehaviorSubject, combineLatest, debounceTime, map, Observable, takeUnti
 import { DialogService } from "../../../../shared";
 import { NotificationService } from "../../../../shared";
 import { CustomerFormComponent } from "../customer-form/customer-form.component";
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { SafeUnsubscribe } from "../../../../shared/services/safe-unsubscribe";
+import { MatDialog } from '@angular/material/dialog';
+import { BaseListComponent } from "../../../../shared/components/base-list.component";
 
 @Component({
   selector: 'app-customer-list',
   templateUrl: './customer-list.component.html',
   styleUrls: ['./customer-list.component.scss']
 })
-export class CustomerListComponent extends SafeUnsubscribe implements OnInit {
-  displayedColumns= ['firstName', 'lastName', 'addresses', 'actions'];
-  filteredCustomers$?: Observable<Customer[]>;
+export class CustomerListComponent extends BaseListComponent implements OnInit {
+  displayedColumns = ['firstName', 'lastName', 'addresses', 'actions'];
+  filteredCustomers$!: Observable<Customer[]>;
   loading$ = this.customerFacade.loading$;
   selectedCustomer$ = this.customerFacade.selectedCustomer$;
 
@@ -25,28 +25,28 @@ export class CustomerListComponent extends SafeUnsubscribe implements OnInit {
   constructor(
     private customerFacade: CustomerFacade,
     private dialogService: DialogService,
-    private notificationService: NotificationService,
-    private dialog: MatDialog,
-    private router: Router
+    private router: Router,
+    dialog: MatDialog,
+    notificationService: NotificationService
   ) {
-    super();
+    super(dialog, notificationService);
   }
 
   ngOnInit(): void {
     this.customerFacade.loadCustomers();
-    this.filterCustomers();
+    this.setupFiltering();
   }
 
   openAddCustomerDialog(): void {
-    const dialogRef = this.dialog.open(CustomerFormComponent);
-    this.closeDialog(dialogRef);
+    this.openDialog(CustomerFormComponent, {}, 'Customer added successfully');
   }
 
   editCustomer(customer: Customer): void {
-    const dialogRef = this.dialog.open(CustomerFormComponent, {
-      data: { customer, isEdit: true }
-    });
-    this.closeDialog(dialogRef);
+    this.openDialog(
+      CustomerFormComponent,
+      { data: { customer, isEdit: true } },
+      'Customer updated successfully'
+    );
   }
 
   deleteCustomer(customer: Customer): void {
@@ -74,29 +74,29 @@ export class CustomerListComponent extends SafeUnsubscribe implements OnInit {
     this.customerFacade.selectedCustomer(undefined);
   }
 
-  private closeDialog(dialogRef: MatDialogRef<CustomerFormComponent, any>): void {
-    dialogRef.afterClosed()
-      .pipe(
-        filter(Boolean),
-        takeUntil(this._ngUnsubscribe)
-      ).subscribe(() => this.notificationService.success('Customer added successfully'));
-  }
-
-  private filterCustomers(): void {
-    this.filteredCustomers$ = combineLatest([this.customerFacade.customers$, this.searchSubject$.asObservable()])
-      .pipe(
-        debounceTime(300),
-        map(([customers, searchKey]) =>
-          customers.filter(c => c.firstName.toLowerCase().includes(searchKey.toLowerCase()) ||
-            c.lastName.toLowerCase().includes(searchKey.toLowerCase())
-          )
-        )
-      );
-  }
-
   viewCustomerQuotes(customer: Customer): void {
     this.router.navigate(['/quotes'], {
       queryParams: { customerId: customer.id }
     });
+  }
+
+  private setupFiltering(): void {
+    this.filteredCustomers$ = combineLatest([
+      this.customerFacade.customers$,
+      this.searchSubject$.asObservable()
+    ]).pipe(
+      map(([customers, searchKey]) =>
+        customers.filter(c =>
+          this.matchesSearch(c, searchKey)
+        )
+      )
+    );
+  }
+
+  private matchesSearch(customer: Customer, searchKey: string): boolean {
+    if (!searchKey) return true;
+    const searchLower = searchKey.toLowerCase();
+    return customer.firstName.toLowerCase().includes(searchLower) ||
+           customer.lastName.toLowerCase().includes(searchLower);
   }
 }
