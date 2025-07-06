@@ -1,6 +1,7 @@
 import { createReducer, on } from '@ngrx/store';
 import { Customer } from '../models/customer.model';
 import * as CustomerActions from './customer.actions';
+import {selectedCustomer} from "./customer.selectors";
 
 export interface CustomerState {
   selectedCustomer: Customer | undefined;
@@ -31,6 +32,7 @@ export const customerReducer = createReducer(
 
   on(CustomerActions.updateCustomerSuccess, (state, { customer }) => ({
     ...state,
+    selectedCustomer: getCustomer(state, customer),
     customers: state.customers.map(c => c.id === customer.id ? customer : c)
   })),
 
@@ -44,3 +46,13 @@ export const customerReducer = createReducer(
     selectedCustomer
   }))
 );
+
+/**
+ * if customer is already selected, update selectedCustomer slice of the state as well.
+ * @param state
+ * @param customer
+ */
+function getCustomer(state: CustomerState, customer: Customer): Customer | undefined {
+  return state.selectedCustomer ? customer : undefined;
+}
+

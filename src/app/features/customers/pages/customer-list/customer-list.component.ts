@@ -1,12 +1,12 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CustomerFacade } from '../../state/customer.facade';
 import { Customer } from '../../models/customer.model';
-import { BehaviorSubject, combineLatest, debounceTime, map, Observable, startWith, Subject, takeUntil, filter } from 'rxjs';
+import { BehaviorSubject, combineLatest, debounceTime, map, Observable, takeUntil, filter } from 'rxjs';
 import { DialogService } from "../../../../shared";
 import { NotificationService } from "../../../../shared";
 import { CustomerFormComponent } from "../customer-form/customer-form.component";
-import { MatDialog } from '@angular/material/dialog';
-import {SafeUnsubscribe} from "../../../../shared/services/safe-unsubscribe";
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { SafeUnsubscribe } from "../../../../shared/services/safe-unsubscribe";
 
 @Component({
   selector: 'app-customer-list',
@@ -37,12 +37,13 @@ export class CustomerListComponent extends SafeUnsubscribe implements OnInit {
 
   openAddCustomerDialog(): void {
     const dialogRef = this.dialog.open(CustomerFormComponent);
+    this.closeDialog(dialogRef, 'Customer added successfully');
+  }
 
-    dialogRef.afterClosed()
-      .pipe(takeUntil(this._ngUnsubscribe))
-      .subscribe(() => {
-        this.notificationService.success('Customer added successfully');
-      });
+  editCustomer(customer: Customer): void {
+    const dialogData = { customer, isEdit: true };
+    const dialogRef = this.dialog.open(CustomerFormComponent, { data: dialogData });
+    this.closeDialog(dialogRef, 'Customer updated successfully');
   }
 
   deleteCustomer(customer: Customer): void {
@@ -68,6 +69,14 @@ export class CustomerListComponent extends SafeUnsubscribe implements OnInit {
 
   onCloseDetails(): void {
     this.customerFacade.selectedCustomer(undefined);
+  }
+
+  private closeDialog(dialogRef: MatDialogRef<CustomerFormComponent>, successMessage: string): void {
+    dialogRef.afterClosed()
+      .pipe(
+        filter(Boolean),
+        takeUntil(this._ngUnsubscribe)
+      ).subscribe(() => this.notificationService.success(successMessage));
   }
 
   private filterCustomers(): void {
