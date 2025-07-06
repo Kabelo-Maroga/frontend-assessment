@@ -7,7 +7,7 @@ import { CustomerDetailsComponent } from "./components/customer-details/customer
 import { customerReducer } from './state/customer.reducer';
 import { CustomerEffects } from './state/customer.effects';
 import { SharedModule } from '../../shared';
-import {MatTooltipModule} from "@angular/material/tooltip";
+import { MatTooltipModule } from "@angular/material/tooltip";
 
 @NgModule({
   declarations: [

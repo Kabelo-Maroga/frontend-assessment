@@ -7,6 +7,7 @@ import { NotificationService } from "../../../../shared";
 import { CustomerFormComponent } from "../customer-form/customer-form.component";
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { SafeUnsubscribe } from "../../../../shared/services/safe-unsubscribe";
+import { CustomerFormData } from "../../models/customer-form.model";
 
 @Component({
   selector: 'app-customer-list',
@@ -37,13 +38,14 @@ export class CustomerListComponent extends SafeUnsubscribe implements OnInit {
 
   openAddCustomerDialog(): void {
     const dialogRef = this.dialog.open(CustomerFormComponent);
-    this.closeDialog(dialogRef, 'Customer added successfully');
+    this.closeDialog(dialogRef);
   }
 
   editCustomer(customer: Customer): void {
-    const dialogData = { customer, isEdit: true };
-    const dialogRef = this.dialog.open(CustomerFormComponent, { data: dialogData });
-    this.closeDialog(dialogRef, 'Customer updated successfully');
+    const dialogRef = this.dialog.open(CustomerFormComponent, {
+      data: { customer, isEdit: true }
+    });
+    this.closeDialog(dialogRef);
   }
 
   deleteCustomer(customer: Customer): void {
@@ -71,12 +73,12 @@ export class CustomerListComponent extends SafeUnsubscribe implements OnInit {
     this.customerFacade.selectedCustomer(undefined);
   }
 
-  private closeDialog(dialogRef: MatDialogRef<CustomerFormComponent>, successMessage: string): void {
+  private closeDialog(dialogRef: MatDialogRef<CustomerFormComponent, any>): void {
     dialogRef.afterClosed()
       .pipe(
         filter(Boolean),
         takeUntil(this._ngUnsubscribe)
-      ).subscribe(() => this.notificationService.success(successMessage));
+      ).subscribe(() => this.notificationService.success('Customer added successfully'));
   }
 
   private filterCustomers(): void {

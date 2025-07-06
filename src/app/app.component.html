@@ -1,8 +1,8 @@
-<mat-drawer-container class="example-container">
-  <mat-drawer mode="side" opened>
-    Customer Management
+<mat-drawer-container class="app-container">
+  <mat-drawer mode="side" opened class="sidenav">
+    <app-navigation></app-navigation>
   </mat-drawer>
-  <mat-drawer-content>
-    <app-customer-list></app-customer-list>
+  <mat-drawer-content class="main-content">
+    <router-outlet></router-outlet>
   </mat-drawer-content>
 </mat-drawer-container>

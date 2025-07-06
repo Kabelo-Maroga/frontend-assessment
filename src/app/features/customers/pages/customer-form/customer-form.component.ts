@@ -12,38 +12,63 @@ import { CustomerFormData } from "../../models/customer-form.model";
 })
 export class CustomerFormComponent implements OnInit {
   form: FormGroup;
-  ieEdit: boolean = false;
+  isEditMode: boolean = false;
   customer?: Customer;
 
   constructor(
     private fb: FormBuilder,
     private customerFacade: CustomerFacade,
-    @Inject(MAT_DIALOG_DATA) public data: CustomerFormData,
+    @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<CustomerFormComponent>
   ) {
-    this.ieEdit = data?.isEdit || false;
+    this.isEditMode = data?.isEdit || false;
     this.customer = data?.customer;
-    this.form = this.initializeForm();
+    this.form = this.initForm();
   }
 
   ngOnInit(): void {
-    if (this.ieEdit && this.customer) {
-      this.populateForm();
-    }
+    this.patchCustomerForm();
   }
 
   onSubmit(): void {
-    if (!this.form.valid) {
-      this.markFormAsTouched();
-      return;
-    }
+    if (this.form.valid) {
+      const formValue = this.form.value;
 
-    const formValue = this.form.value;
+      if (this.isEditMode && this.customer) {
+        const updatedCustomer: Customer = {
+          ...this.customer,
+          firstName: formValue.firstName,
+          lastName: formValue.lastName,
+          addresses: [{
+            id: this.customer.addresses?.[0]?.id || this.generateId("ADDR"),
+            street: formValue.street,
+            city: formValue.city,
+            suburb: formValue.suburb,
+            postalCode: formValue.postalCode
+          }]
+        };
 
-    if (this.ieEdit && this.customer) {
-      this.updateCustomer(formValue);
+        this.customerFacade.updateCustomer(updatedCustomer);
+        this.dialogRef.close(updatedCustomer);
+      } else {
+        const newCustomer = {
+          id: this.generateId("CUST"),
+          firstName: formValue.firstName,
+          lastName: formValue.lastName,
+          addresses: [{
+            id: this.generateId("ADDR"),
+            street: formValue.street,
+            city: formValue.city,
+            suburb: formValue.suburb,
+            postalCode: formValue.postalCode
+          }]
+        };
+
+        this.customerFacade.addCustomer(newCustomer);
+        this.dialogRef.close(newCustomer);
+      }
     } else {
-      this.createCustomer(formValue);
+      this.markFormGroupTouched();
     }
   }
 
@@ -51,15 +76,21 @@ export class CustomerFormComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  get dialogTitle(): string {
-    return this.ieEdit ? 'Edit Customer' : 'Add New Customer';
+  private patchCustomerForm(): void {
+    if (this.isEditMode && this.customer) {
+      const firstAddress = this.customer.addresses?.[0];
+      this.form.patchValue({
+        firstName: this.customer.firstName,
+        lastName: this.customer.lastName,
+        street: firstAddress?.street || '',
+        city: firstAddress?.city || '',
+        suburb: firstAddress?.suburb || '',
+        postalCode: firstAddress?.postalCode || ''
+      });
+    }
   }
 
-  get submitButtonText(): string {
-    return this.ieEdit ? 'Update' : 'Create';
-  }
-
-  private initializeForm(): FormGroup {
+  private initForm(): FormGroup {
     return this.fb.group({
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
@@ -70,64 +101,12 @@ export class CustomerFormComponent implements OnInit {
     });
   }
 
-  private populateForm(): void {
-    if (!this.customer) return;
-
-    const firstAddress = this.customer.addresses?.[0];
-    this.form.patchValue({
-      firstName: this.customer.firstName,
-      lastName: this.customer.lastName,
-      street: firstAddress?.street || '',
-      city: firstAddress?.city || '',
-      suburb: firstAddress?.suburb || '',
-      postalCode: firstAddress?.postalCode || ''
-    });
-  }
-
-  private updateCustomer(formValue: any): void {
-    if (!this.customer) return;
-
-    const customer = {
-      ...this.customer,
-      firstName: formValue.firstName,
-      lastName: formValue.lastName,
-      addresses: [{
-        id: this.customer.addresses?.[0]?.id || this.generateId("ADDR"),
-        street: formValue.street,
-        city: formValue.city,
-        suburb: formValue.suburb,
-        postalCode: formValue.postalCode
-      }]
-    };
-
-    this.customerFacade.updateCustomer(customer);
-    this.dialogRef.close(customer);
-  }
-
-  private createCustomer(formValue: any): void {
-    const newCustomer = {
-      id: this.generateId("CUST"),
-      firstName: formValue.firstName,
-      lastName: formValue.lastName,
-      addresses: [{
-        id: this.generateId("ADDR"),
-        street: formValue.street,
-        city: formValue.city,
-        suburb: formValue.suburb,
-        postalCode: formValue.postalCode
-      }]
-    };
-
-    this.customerFacade.addCustomer(newCustomer);
-    this.dialogRef.close(newCustomer);
-  }
-
   private generateId(prefix: string): string {
     const timestamp = Date.now();
     return `${prefix}-${timestamp}`;
   }
 
-  private markFormAsTouched(): void {
+  private markFormGroupTouched(): void {
     Object.keys(this.form.controls).forEach(key => {
       const control = this.form.get(key);
       control?.markAsTouched();
