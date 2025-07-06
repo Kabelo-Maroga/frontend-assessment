@@ -4,8 +4,3 @@ export interface DialogData<T = any> {
   confirmText?: string;
   cancelText?: string;
 }
-
-export interface DialogResult {
-  confirmed: boolean;
-  data?: any;
-}

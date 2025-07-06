@@ -26,7 +26,6 @@ import { QuoteModule } from "./features/quotes/quote.module";
         SharedModule,
         CustomerModule,
         QuoteModule,
-        MatListModule
     ],
   providers: [],
   bootstrap: [AppComponent]

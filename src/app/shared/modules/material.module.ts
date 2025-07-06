@@ -26,7 +26,7 @@ const MATERIAL_MODULES = [
   MatSnackBarModule,
   MatListModule,
   MatSelectModule,
-  MatTooltipModule
+  MatTooltipModule,
 ];
 
 @NgModule({
