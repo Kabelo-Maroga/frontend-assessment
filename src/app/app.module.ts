@@ -9,13 +9,12 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { CustomerModule } from "./features/customers/customer.module";
 import { SharedModule } from "./shared";
-import { QuoteListComponent } from './features/quotes/pages/quote-list/quote-list.component';
 import { MatListModule } from "@angular/material/list";
+import { QuoteModule } from "./features/quotes/quote.module";
 
 @NgModule({
   declarations: [
-    AppComponent,
-    QuoteListComponent
+    AppComponent
   ],
     imports: [
         BrowserAnimationsModule,
@@ -26,6 +25,7 @@ import { MatListModule } from "@angular/material/list";
         EffectsModule.forRoot([]),
         SharedModule,
         CustomerModule,
+        QuoteModule,
         MatListModule
     ],
   providers: [],

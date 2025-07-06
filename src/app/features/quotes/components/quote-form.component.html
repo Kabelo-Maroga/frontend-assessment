@@ -1,0 +1,30 @@
+<h2 mat-dialog-title>{{ data?.id ? 'Edit' : 'Add' }} Quote</h2>
+<mat-dialog-content [formGroup]="form">
+  <mat-form-field class="full-width" appearance="fill">
+    <mat-label>Customer</mat-label>
+    <input matInput/>
+  </mat-form-field>
+
+  <mat-form-field class="full-width" appearance="fill">
+    <mat-label>Amount</mat-label>
+    <input matInput formControlName="amount" type="number" />
+  </mat-form-field>
+
+  <mat-form-field class="full-width" appearance="fill">
+    <mat-label>Status</mat-label>
+    <mat-select formControlName="status">
+      <mat-option value="Pending">Pending</mat-option>
+      <mat-option value="Approved">Approved</mat-option>
+      <mat-option value="Declined">Declined</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field class="full-width" appearance="fill">
+    <mat-label>Created Date</mat-label>
+    <input matInput formControlName="createdDate" type="date" />
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="submit()">Save</button>
+</mat-dialog-actions>
