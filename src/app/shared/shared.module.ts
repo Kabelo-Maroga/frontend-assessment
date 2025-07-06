@@ -1,12 +1,20 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
+import { MaterialModule } from './modules/material.module';
+import { DialogService } from './services/dialog.service';
+import {SafeUnsubscribe} from "./services/safe-unsubscribe";
 
 @NgModule({
-  declarations: [ConfirmDialogComponent],
-  imports: [CommonModule, MatDialogModule, MatButtonModule],
-  exports: [ConfirmDialogComponent]
+  declarations: [ConfirmDialogComponent, SafeUnsubscribe],
+  imports: [CommonModule, MaterialModule, ReactiveFormsModule],
+  exports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MaterialModule,
+    ConfirmDialogComponent
+  ],
+  providers: [DialogService]
 })
 export class SharedModule {}

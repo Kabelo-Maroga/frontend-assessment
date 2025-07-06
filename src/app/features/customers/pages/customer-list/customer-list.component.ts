@@ -1,55 +1,80 @@
-import {Component, OnInit} from '@angular/core';
-import {CustomerFacade} from '../../state/customer.facade';
-import {Customer} from '../../models/customer.model';
-import {BehaviorSubject, combineLatest, debounceTime, map, Observable, startWith} from 'rxjs';
-import {DialogService} from "../../../../shared/services/dialog.service";
-import {MatDialog} from "@angular/material/dialog";
-import {CustomerFormComponent} from "../customer-form/customer-form.component";
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CustomerFacade } from '../../state/customer.facade';
+import { Customer } from '../../models/customer.model';
+import { BehaviorSubject, combineLatest, debounceTime, map, Observable, startWith, Subject, takeUntil, filter } from 'rxjs';
+import { DialogService } from "../../../../shared";
+import { NotificationService } from "../../../../shared";
+import { CustomerFormComponent } from "../customer-form/customer-form.component";
+import { MatDialog } from '@angular/material/dialog';
+import {SafeUnsubscribe} from "../../../../shared/services/safe-unsubscribe";
 
 @Component({
   selector: 'app-customer-list',
   templateUrl: './customer-list.component.html',
   styleUrls: ['./customer-list.component.scss']
 })
-export class CustomerListComponent implements OnInit {
-  displayedColumns: string[] = ['firstName', 'lastName', 'addresses', 'actions'];
-  filteredCustomers$: Observable<Customer[]>;
+export class CustomerListComponent extends SafeUnsubscribe implements OnInit {
+  displayedColumns= ['firstName', 'lastName', 'addresses', 'actions'];
+  filteredCustomers$?: Observable<Customer[]>;
+  loading$ = this.customerFacade.loading$;
+  selectedCustomer$ = this.customerFacade.selectedCustomer$;
 
-  private searchSubject = new BehaviorSubject<string>('');
+  private searchSubject$ = new BehaviorSubject<string>('');
 
-  constructor(private customerFacade: CustomerFacade,
-              private dialogService: DialogService<Customer>,
-              private dialog: MatDialog) {
-    this.filteredCustomers$ = combineLatest([
-      this.customerFacade.customers$,
-      this.searchSubject.asObservable().pipe(startWith(''))])
-      .pipe(
-        debounceTime(200),
-        map(([customers, search]) =>
-        customers.filter(c => c.firstName.toLowerCase().includes(search.toLowerCase())))
-    );
+  constructor(
+    private customerFacade: CustomerFacade,
+    private dialogService: DialogService,
+    private notificationService: NotificationService,
+    private dialog: MatDialog
+  ) {
+    super();
   }
 
   ngOnInit(): void {
     this.customerFacade.loadCustomers();
+    this.filterCustomers();
   }
 
   openAddCustomerDialog(): void {
-    this.dialog.open(CustomerFormComponent);
+    const dialogRef = this.dialog.open(CustomerFormComponent);
+
+    dialogRef.afterClosed()
+      .pipe(takeUntil(this._ngUnsubscribe))
+      .subscribe(() => {
+        this.notificationService.success('Customer added successfully');
+      });
   }
 
   deleteCustomer(customer: Customer): void {
-    this.dialogService.confirm("Confirm", "Are you sure you want to delete this user?", customer);
+    this.dialogService.confirm({
+      message: 'Are you sure you want to delete this customer?',
+      entity: customer
+    }).pipe(
+      filter(Boolean),
+      takeUntil(this._ngUnsubscribe)
+    ).subscribe(() => {
+      this.customerFacade.deleteCustomer(customer.id);
+      this.notificationService.success('Customer deleted successfully');
+    });
   }
-
 
   onSearch(value: string): void {
-    this.searchSubject.next(value);
+    this.searchSubject$.next(value);
   }
 
-  selectedCustomer: Customer | null = null;
-
   onRowClick(customer: Customer): void {
-    this.selectedCustomer = customer;
+    this.customerFacade.selectedCustomer(customer);
+  }
+
+  private filterCustomers(): void {
+    this.filteredCustomers$ = combineLatest([this.customerFacade.customers$, this.searchSubject$.asObservable()])
+      .pipe(
+        debounceTime(300),
+        map(([customers, searchKey]) =>
+          customers.filter(c => c.firstName.toLowerCase().includes(searchKey.toLowerCase()) ||
+            c.lastName.toLowerCase().includes(searchKey.toLowerCase())
+          )
+        )
+      );
   }
 }

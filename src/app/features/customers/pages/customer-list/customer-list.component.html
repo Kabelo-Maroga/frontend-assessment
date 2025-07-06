@@ -1,53 +1,82 @@
 <div class="customer-list-container">
   <h2>Customer Management</h2>
 
-  <div class="toolbar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-    <mat-form-field appearance="fill" style="margin-right: 1rem;">
-      <mat-label>Search by First Name</mat-label>
-      <input matInput #searchInput (input)="onSearch(searchInput.value)" placeholder="Type to filter..." />
+  <div class="toolbar">
+    <mat-form-field appearance="outline">
+      <mat-label>Search customers</mat-label>
+      <input
+        matInput
+        #searchInput
+        (input)="onSearch(searchInput.value)"
+        placeholder="Search by first or last name..."
+      />
+      <mat-icon matPrefix>search</mat-icon>
     </mat-form-field>
 
     <button mat-raised-button color="primary" (click)="openAddCustomerDialog()">
+      <mat-icon>add</mat-icon>
       Add Customer
     </button>
   </div>
 
+  <div class="customer-list-layout">
+    <div class="table-container">
+      <div *ngIf="loading$ | async" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
 
-  <div class="customer-list-layout" style="display: flex;">
-    <div style="flex: 2; margin-right: 1rem;">
-      <!-- Your existing table -->
-      <table mat-table [dataSource]="(filteredCustomers$ | async) || []" class="mat-elevation-z8" multiTemplateDataRows>
+      <table
+        *ngIf="!(loading$ | async)"
+        mat-table
+        [dataSource]="(filteredCustomers$ | async) || []"
+        class="mat-elevation-z8 customer-table"
+      >
         <!-- First Name Column -->
         <ng-container matColumnDef="firstName">
-          <th mat-header-cell *matHeaderCellDef style="width: 22%;"> First Name </th>
-          <td mat-cell *matCellDef="let customer" style="width: 22%;"> {{ customer.firstName }} </td>
+          <th mat-header-cell *matHeaderCellDef class="column-firstName">First Name</th>
+          <td mat-cell *matCellDef="let customer" class="column-firstName">
+            {{ customer.firstName }}
+          </td>
         </ng-container>
 
         <!-- Last Name Column -->
         <ng-container matColumnDef="lastName">
-          <th mat-header-cell *matHeaderCellDef style="width: 22%;"> Last Name </th>
-          <td mat-cell *matCellDef="let customer" style="width: 22%;"> {{ customer.lastName }} </td>
+          <th mat-header-cell *matHeaderCellDef class="column-lastName">Last Name</th>
+          <td mat-cell *matCellDef="let customer" class="column-lastName">
+            {{ customer.lastName }}
+          </td>
         </ng-container>
 
         <!-- Addresses Column -->
         <ng-container matColumnDef="addresses">
-          <th mat-header-cell *matHeaderCellDef style="width: 22%;"> Addresses </th>
-          <td mat-cell *matCellDef="let customer" style="width: 22%;">
-            <ul>
-              <li *ngFor="let address of customer.addresses" style="margin: 0; padding: 1.2rem;">
+          <th mat-header-cell *matHeaderCellDef class="column-addresses">Addresses</th>
+          <td mat-cell *matCellDef="let customer" class="column-addresses">
+            <ul class="address-list" *ngIf="customer.addresses?.length; else noAddresses">
+              <li *ngFor="let address of customer.addresses">
                 {{ address.city }}, {{ address.postalCode }}
               </li>
             </ul>
+            <ng-template #noAddresses>
+              <span class="no-data">No addresses</span>
+            </ng-template>
           </td>
         </ng-container>
 
         <!-- Actions Column -->
         <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef style="width: 22%;"> Actions </th>
-          <td mat-cell *matCellDef="let customer" style="width: 22%;">
-            <button mat-icon-button color="accent" (click)="deleteCustomer(customer); $event.stopPropagation()">
-              <mat-icon>delete</mat-icon>
-            </button>
+          <th mat-header-cell *matHeaderCellDef class="column-actions">Actions</th>
+          <td mat-cell *matCellDef="let customer" class="column-actions">
+            <div class="action-buttons">
+              <button
+                mat-icon-button
+                color="warn"
+                (click)="deleteCustomer(customer); $event.stopPropagation()"
+                matTooltip="Delete customer"
+                aria-label="Delete customer"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
           </td>
         </ng-container>
 
@@ -60,13 +89,13 @@
           *matRowDef="let row; columns: displayedColumns"
           (click)="onRowClick(row)"
           class="clickable-row"
+          [class.selected]="(selectedCustomer$ | async)?.id === row.id"
         ></tr>
       </table>
-
     </div>
 
-    <div style="flex: 1;" class="mat-elevation-z8" *ngIf="selectedCustomer">
-      <app-customer-details [customer]="selectedCustomer"></app-customer-details>
+    <div class="details-container mat-elevation-z8" *ngIf="selectedCustomer$ | async">
+      <app-customer-details></app-customer-details>
     </div>
   </div>
 </div>

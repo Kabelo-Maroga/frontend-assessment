@@ -3,22 +3,26 @@ import { Customer } from '../models/customer.model';
 import * as CustomerActions from './customer.actions';
 
 export interface CustomerState {
+  selectedCustomer: Customer | undefined;
   customers: Customer[];
   loading: boolean;
-  error: any;
 }
 
 export const initialState: CustomerState = {
+  selectedCustomer: undefined,
   customers: [],
   loading: false,
-  error: null
 };
 
 export const customerReducer = createReducer(
   initialState,
-  on(CustomerActions.loadCustomers, state => ({ ...state, loading: true })),
-  on(CustomerActions.loadCustomersSuccess, (state, { customers }) => ({ ...state, loading: false, customers })),
-  on(CustomerActions.loadCustomersFailure, (state, { error }) => ({ ...state, loading: false, error })),
+  on(CustomerActions.loadCustomers, state => ({
+    ...state, loading: true
+  })),
+
+  on(CustomerActions.loadCustomersSuccess, (state, { customers }) => ({
+    ...state, loading: false, customers
+  })),
 
   on(CustomerActions.addCustomerSuccess, (state, { customer }) => ({
     ...state,
@@ -33,5 +37,10 @@ export const customerReducer = createReducer(
   on(CustomerActions.deleteCustomerSuccess, (state, { customerId }) => ({
     ...state,
     customers: state.customers.filter(c => c.id !== customerId)
+  })),
+
+  on(CustomerActions.selectCustomer, (state, { selectedCustomer }) => ({
+    ...state,
+    selectedCustomer
   }))
 );

@@ -16,3 +16,5 @@ export const updateCustomerFailure = createAction('[Customer] Update Customer Fa
 export const deleteCustomer = createAction('[Customer] Delete Customer', props<{ customerId: string }>());
 export const deleteCustomerSuccess = createAction('[Customer] Delete Customer Success', props<{ customerId: string }>());
 export const deleteCustomerFailure = createAction('[Customer] Delete Customer Failure', props<{ error: any }>());
+
+export const selectCustomer = createAction('[Customer] Select Customer', props<{ selectedCustomer: Customer | undefined }>());

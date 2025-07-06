@@ -13,7 +13,7 @@ export const selectLoading = createSelector(
   (state: CustomerState) => state.loading
 );
 
-export const selectError = createSelector(
+export const selectedCustomer = createSelector(
   selectCustomerState,
-  (state: CustomerState) => state.error
+  (state: CustomerState) => state.selectedCustomer
 );
