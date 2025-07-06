@@ -7,26 +7,21 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
-import { CustomerModule } from "./features/customers/customer.module";
 import { SharedModule } from "./shared";
-import { MatListModule } from "@angular/material/list";
-import { QuoteModule } from "./features/quotes/quote.module";
 
 @NgModule({
   declarations: [
     AppComponent
   ],
-    imports: [
-        BrowserAnimationsModule,
-        BrowserModule,
-        AppRoutingModule,
-        HttpClientModule,
-        StoreModule.forRoot({}, {}),
-        EffectsModule.forRoot([]),
-        SharedModule,
-        CustomerModule,
-        QuoteModule,
-    ],
+  imports: [
+    BrowserAnimationsModule,
+    BrowserModule,
+    AppRoutingModule,
+    HttpClientModule,
+    StoreModule.forRoot({}, {}),
+    EffectsModule.forRoot([]),
+    SharedModule,
+  ],
   providers: [],
   bootstrap: [AppComponent]
 })

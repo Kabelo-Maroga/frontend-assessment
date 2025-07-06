@@ -1,16 +1,23 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { CustomerListComponent } from './features/customers/components/customer-list/customer-list.component';
-import { QuoteListComponent } from './features/quotes/components/quote-list/quote-list.component';
+import { RouterModule, Routes, PreloadAllModules } from '@angular/router';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/customers', pathMatch: 'full' },
-  { path: 'customers', component: CustomerListComponent },
-  { path: 'quotes', component: QuoteListComponent }
+  { path: '', redirectTo: '/quotes', pathMatch: 'full' },
+  {
+    path: 'customers',
+    loadChildren: () => import('./features/customers/customer.module').then(m => m.CustomerModule)
+  },
+  {
+    path: 'quotes',
+    loadChildren: () => import('./features/quotes/quote.module').then(m => m.QuoteModule)
+  },
+  { path: '**', redirectTo: '/quotes' }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, {
+    preloadingStrategy: PreloadAllModules
+  })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
