@@ -2,15 +2,45 @@
   padding: 1rem;
 }
 
-.toolbar {
-  margin-bottom: 1rem;
+.filters-section {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 1rem;
+
+  .search-filters {
+    display: flex;
+    gap: 1rem;
+    flex: 1;
+
+    .search-field {
+      flex: 1;
+      max-width: 300px;
+    }
+
+    .status-filter {
+      min-width: 150px;
+    }
+  }
 }
 
 .quote-table {
   width: 100%;
   margin-top: 1rem;
+
+  .mat-column-actions {
+    width: 120px;
+    text-align: center;
+  }
+
+  .mat-icon-button {
+    margin: 0 4px;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+  }
 }
 
 .status-badge {
@@ -19,19 +49,54 @@
   font-size: 0.75rem;
   font-weight: 500;
   text-transform: uppercase;
-  
+
   &.status-pending {
     background-color: #fff3cd;
     color: #856404;
   }
-  
+
   &.status-approved {
     background-color: #d1edff;
     color: #0c5460;
   }
-  
+
   &.status-declined {
     background-color: #f8d7da;
     color: #721c24;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .filters-section {
+    flex-direction: column;
+    align-items: stretch;
+
+    .search-filters {
+      flex-direction: column;
+
+      .search-field {
+        max-width: none;
+      }
+    }
+  }
+
+  .quote-table {
+    .mat-column-actions {
+      width: 80px;
+    }
+
+    .mat-icon-button {
+      padding: 6px;
+      width: 32px;
+      height: 32px;
+      line-height: 32px;
+
+      .mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
   }
 }

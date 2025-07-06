@@ -1,14 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Quote } from '../models/quote.model';
+import { Quote, QuoteWithCustomer } from '../models/quote.model';
 import { Customer } from '../../customers/models/customer.model';
 import { Observable, of, combineLatest } from 'rxjs';
 import { map, delay } from 'rxjs/operators';
-
-export interface QuoteWithCustomer extends Quote {
-  customerFullName: string;
-  customer?: Customer;
-}
 
 @Injectable({
   providedIn: 'root',
@@ -46,7 +41,10 @@ export class QuoteService {
   }
 
   addQuote(quote: Quote): Observable<Quote> {
-    return of(quote).pipe(delay(300)); // Simulate API delay
+    // In a real app, this would make an HTTP POST request
+    // For now, we'll simulate the API call
+    console.log('Adding new quote:', quote);
+    return of(quote).pipe(delay(300));
   }
 
   updateQuote(quote: Quote): Observable<Quote> {

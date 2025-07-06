@@ -20,6 +20,18 @@ export class QuoteEffects {
     )
   );
 
+  loadQuotesWithCustomers$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(QuoteActions.loadQuotesWithCustomers),
+      mergeMap(() =>
+        this.quoteService.getQuotesWithCustomers().pipe(
+          map((quotesWithCustomers) => QuoteActions.loadQuotesWithCustomersSuccess({ quotesWithCustomers })),
+          catchError((error) => of(QuoteActions.loadQuotesWithCustomersFailure({ error })))
+        )
+      )
+    )
+  );
+
   addQuote$ = createEffect(() =>
     this.actions$.pipe(
       ofType(QuoteActions.addQuote),

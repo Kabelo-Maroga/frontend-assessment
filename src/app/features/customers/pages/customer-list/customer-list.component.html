@@ -69,6 +69,15 @@
             <div class="action-buttons">
               <button
                 mat-icon-button
+                color="accent"
+                (click)="viewCustomerQuotes(customer); $event.stopPropagation()"
+                matTooltip="View quotes"
+                aria-label="View customer quotes"
+              >
+                <mat-icon>receipt</mat-icon>
+              </button>
+              <button
+                mat-icon-button
                 color="primary"
                 (click)="editCustomer(customer); $event.stopPropagation()"
                 matTooltip="Edit customer"

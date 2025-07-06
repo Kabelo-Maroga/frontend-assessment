@@ -1,11 +1,37 @@
 <div class="quote-list-container">
   <h2>Quote Management</h2>
 
-  <div class="toolbar">
-    <button mat-raised-button color="primary">Add Quote</button>
+  <div class="filters-section">
+    <div class="search-filters">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search by customer</mat-label>
+        <input
+          matInput
+          #searchInput
+          (input)="onSearch(searchInput.value)"
+          placeholder="Search customer name..."
+        />
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="status-filter">
+        <mat-label>Filter by status</mat-label>
+        <mat-select (selectionChange)="onStatusFilter($event.value)">
+          <mat-option value="">All Statuses</mat-option>
+          <mat-option *ngFor="let status of statusOptions.slice(1)" [value]="status">
+            {{ status }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <button mat-raised-button color="primary" (click)="openAddQuoteDialog()">
+      <mat-icon>add</mat-icon>
+      Add Quote
+    </button>
   </div>
 
-  <table mat-table [dataSource]="(quotes$ | async) || []" class="mat-elevation-z8 quote-table">
+  <table mat-table [dataSource]="(filteredQuotes$ | async) || []" class="mat-elevation-z8 quote-table">
     <ng-container matColumnDef="customerFullName">
       <th mat-header-cell *matHeaderCellDef>Customer</th>
       <td mat-cell *matCellDef="let quote">{{quote.customerFullName}}</td>
@@ -35,7 +61,33 @@
       <td mat-cell *matCellDef="let quote">{{quote.createdDate | date:'mediumDate'}}</td>
     </ng-container>
 
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let quote">
+        <button 
+          mat-icon-button 
+          color="primary" 
+          (click)="openEditQuoteDialog(quote); $event.stopPropagation()"
+          matTooltip="Edit Quote">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button 
+          mat-icon-button 
+          color="warn" 
+          (click)="deleteQuote(quote); $event.stopPropagation()"
+          matTooltip="Delete Quote">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    <tr 
+      mat-row 
+      *matRowDef="let row; columns: displayedColumns;"
+      (click)="onRowClick(row)"
+      class="clickable-row"
+      [class.selected]="(selectedQuote$ | async)?.id === row.id">
+    </tr>
   </table>
 </div>

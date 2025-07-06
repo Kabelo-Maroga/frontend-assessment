@@ -6,3 +6,8 @@ export interface Quote {
   createdDate: string;
   description: string;
 }
+
+export interface QuoteWithCustomer extends Quote {
+  customerFullName: string;
+  customer?: any; // Customer object for additional data
+}

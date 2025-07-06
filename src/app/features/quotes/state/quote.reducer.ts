@@ -1,15 +1,19 @@
 import { createReducer, on } from '@ngrx/store';
 import * as QuoteActions from './quote.actions';
-import { Quote } from '../models/quote.model';
+import { Quote, QuoteWithCustomer } from '../models/quote.model';
 
 export interface QuoteState {
   quotes: Quote[];
+  quotesWithCustomers: QuoteWithCustomer[];
+  selectedQuote: QuoteWithCustomer | undefined;
   loading: boolean;
   error: any;
 }
 
 export const initialState: QuoteState = {
   quotes: [],
+  quotesWithCustomers: [],
+  selectedQuote: undefined,
   loading: false,
   error: null,
 };
@@ -33,6 +37,22 @@ export const quoteReducer = createReducer(
     error,
   })),
 
+  on(QuoteActions.loadQuotesWithCustomers, (state) => ({
+    ...state,
+    loading: true,
+    error: null,
+  })),
+  on(QuoteActions.loadQuotesWithCustomersSuccess, (state, { quotesWithCustomers }) => ({
+    ...state,
+    quotesWithCustomers,
+    loading: false,
+  })),
+  on(QuoteActions.loadQuotesWithCustomersFailure, (state, { error }) => ({
+    ...state,
+    loading: false,
+    error,
+  })),
+
   on(QuoteActions.addQuoteSuccess, (state, { quote }) => ({
     ...state,
     quotes: [...state.quotes, quote],
@@ -44,5 +64,10 @@ export const quoteReducer = createReducer(
   on(QuoteActions.deleteQuoteSuccess, (state, { id }) => ({
     ...state,
     quotes: state.quotes.filter((q) => q.id !== id),
+  })),
+
+  on(QuoteActions.selectQuote, (state, { quote }) => ({
+    ...state,
+    selectedQuote: quote,
   }))
 );

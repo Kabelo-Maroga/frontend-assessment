@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { CustomerFacade } from '../../state/customer.facade';
 import { Customer } from '../../models/customer.model';
 import { BehaviorSubject, combineLatest, debounceTime, map, Observable, takeUntil, filter } from 'rxjs';
@@ -7,7 +8,6 @@ import { NotificationService } from "../../../../shared";
 import { CustomerFormComponent } from "../customer-form/customer-form.component";
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { SafeUnsubscribe } from "../../../../shared/services/safe-unsubscribe";
-import { CustomerFormData } from "../../models/customer-form.model";
 
 @Component({
   selector: 'app-customer-list',
@@ -26,7 +26,8 @@ export class CustomerListComponent extends SafeUnsubscribe implements OnInit {
     private customerFacade: CustomerFacade,
     private dialogService: DialogService,
     private notificationService: NotificationService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private router: Router
   ) {
     super();
   }
@@ -91,5 +92,11 @@ export class CustomerListComponent extends SafeUnsubscribe implements OnInit {
           )
         )
       );
+  }
+
+  viewCustomerQuotes(customer: Customer): void {
+    this.router.navigate(['/quotes'], {
+      queryParams: { customerId: customer.id }
+    });
   }
 }
