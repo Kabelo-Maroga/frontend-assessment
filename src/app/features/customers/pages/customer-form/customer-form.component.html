@@ -31,6 +31,9 @@
       <input matInput formControlName="postalCode" required />
     </mat-form-field>
 
-    <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Add Customer</button>
+    <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
+      <button mat-button type="button" mat-dialog-close>Cancel</button>
+      <button mat-raised-button color="primary" type="submit" [mat-dialog-close]="true" [disabled]="form.invalid">Create</button>
+    </div>
   </form>
 </div>

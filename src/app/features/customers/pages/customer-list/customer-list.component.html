@@ -1,13 +1,16 @@
 <div class="customer-list-container">
   <h2>Customer Management</h2>
-  <div>
-    <app-customer-form></app-customer-form>
-  </div>
 
-  <mat-form-field appearance="fill" class="full-width">
-    <mat-label>Search by First Name</mat-label>
-    <input matInput #searchInput (input)="onSearch(searchInput.value)" placeholder="Type to filter..." />
-  </mat-form-field>
+  <div class="toolbar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+    <mat-form-field appearance="fill" style="margin-right: 1rem;">
+      <mat-label>Search by First Name</mat-label>
+      <input matInput #searchInput (input)="onSearch(searchInput.value)" placeholder="Type to filter..." />
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" (click)="openAddCustomerDialog()">
+      Add Customer
+    </button>
+  </div>
 
   <table mat-table [dataSource]="(filteredCustomers$ | async) || []" class="mat-elevation-z8" multiTemplateDataRows>
     <ng-container matColumnDef="firstName">
