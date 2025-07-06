@@ -13,9 +13,10 @@ import { MatInputModule } from "@angular/material/input";
 import { MatButtonModule } from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {MatDialogModule} from "@angular/material/dialog";
+import {CustomerDetailsComponent} from "./components/customer-details/customer-details.component";
 
 @NgModule({
-  declarations: [CustomerListComponent, CustomerFormComponent],
+  declarations: [CustomerListComponent, CustomerFormComponent, CustomerDetailsComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,

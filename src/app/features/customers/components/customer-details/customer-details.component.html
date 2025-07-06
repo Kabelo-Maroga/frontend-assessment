@@ -1,0 +1,13 @@
+<div class="customer-details-container" *ngIf="customer">
+  <h3 style="padding: 0.5rem;">Customer Details</h3>
+  <p style="padding: 0.5rem;"><strong>First Name:</strong> {{ customer.firstName }}</p>
+  <p style="padding: 0.5rem;"><strong>Last Name:</strong> {{ customer.lastName }}</p>
+  <div style="padding: 0.5rem;" *ngIf="customer.addresses?.length">
+    <p><strong>Addresses:</strong></p>
+    <ul>
+      <li *ngFor="let address of customer.addresses">
+        {{ address.street }}, {{ address.city }}, {{ address.suburb }}, {{ address.postalCode }}
+      </li>
+    </ul>
+  </div>
+</div>

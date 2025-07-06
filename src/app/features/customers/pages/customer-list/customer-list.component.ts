@@ -46,4 +46,10 @@ export class CustomerListComponent implements OnInit {
   onSearch(value: string): void {
     this.searchSubject.next(value);
   }
+
+  selectedCustomer: Customer | null = null;
+
+  onRowClick(customer: Customer): void {
+    this.selectedCustomer = customer;
+  }
 }
