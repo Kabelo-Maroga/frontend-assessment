@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CustomerFacade } from '../../state/customer.facade';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Customer } from '../../models/customer.model';
-import { CustomerFormData } from "../../models/customer-form.model";
 
 @Component({
   selector: 'app-customer-form',

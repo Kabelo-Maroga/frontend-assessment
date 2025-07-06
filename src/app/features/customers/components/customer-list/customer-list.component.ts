@@ -2,12 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CustomerFacade } from '../../state/customer.facade';
 import { Customer } from '../../models/customer.model';
-import { BehaviorSubject, combineLatest, debounceTime, map, Observable, takeUntil, filter } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable, takeUntil, filter } from 'rxjs';
 import { DialogService } from "../../../../shared";
 import { NotificationService } from "../../../../shared";
 import { CustomerFormComponent } from "../customer-form/customer-form.component";
 import { MatDialog } from '@angular/material/dialog';
-import { BaseListComponent } from "../../../../shared/components/base-list.component";
+import { BaseListComponent } from "../../../../shared";
 
 @Component({
   selector: 'app-customer-list',
