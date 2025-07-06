@@ -5,23 +5,32 @@
   </div>
   <table mat-table [dataSource]="(customers$ | async) || []" class="mat-elevation-z8" multiTemplateDataRows>
     <ng-container matColumnDef="firstName">
-      <th mat-header-cell *matHeaderCellDef> First Name </th>
-      <td mat-cell *matCellDef="let customer"> {{customer.firstName}} </td>
+      <th mat-header-cell *matHeaderCellDef style="width: 22%;"> First Name </th>
+      <td mat-cell *matCellDef="let customer" style="width: 22%;"> {{customer.firstName}} </td>
     </ng-container>
 
     <ng-container matColumnDef="lastName">
-      <th mat-header-cell *matHeaderCellDef> Last Name </th>
-      <td mat-cell *matCellDef="let customer"> {{customer.lastName}} </td>
+      <th mat-header-cell *matHeaderCellDef style="width: 22%;"> Last Name </th>
+      <td mat-cell *matCellDef="let customer" style="width: 22%;"> {{customer.lastName}} </td>
     </ng-container>
 
     <ng-container matColumnDef="addresses">
-      <th mat-header-cell *matHeaderCellDef> Addresses </th>
-      <td mat-cell *matCellDef="let customer">
-        <ul style="margin: 0; padding-left: 1.2rem;">
-          <li *ngFor="let address of customer.addresses">
+      <th mat-header-cell *matHeaderCellDef style="width: 22%;"> Addresses </th>
+      <td mat-cell *matCellDef="let customer" style="width: 22%;">
+        <ul>
+          <li style="margin: 0; padding: 1.2rem;" *ngFor="let address of customer.addresses">
             {{ address.city }}, {{ address.postalCode }}
           </li>
         </ul>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef style="width: 22%;"> Actions </th>
+      <td mat-cell *matCellDef="let customer" style="width: 22%;">
+        <button mat-icon-button color="accent" (click)="deleteCustomer(customer)">
+          <mat-icon>delete</mat-icon>
+        </button>
       </td>
     </ng-container>
 

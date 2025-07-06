@@ -11,6 +11,7 @@ import { CustomerFormComponent } from "./pages/customer-form/customer-form.compo
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { MatButtonModule } from "@angular/material/button";
+import {MatIconModule} from "@angular/material/icon";
 
 @NgModule({
   declarations: [CustomerListComponent, CustomerFormComponent],
@@ -22,7 +23,8 @@ import { MatButtonModule } from "@angular/material/button";
     EffectsModule.forFeature([CustomerEffects]),
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
+    MatIconModule
   ],
   exports: [CustomerListComponent]
 })

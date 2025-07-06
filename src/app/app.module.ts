@@ -9,6 +9,7 @@ import { CustomerModule } from "./features/customers/customer.module";
 import { HttpClientModule } from "@angular/common/http";
 import {MatSidenavModule} from "@angular/material/sidenav";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {SharedModule} from "./shared/shared.module";
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
     EffectsModule.forRoot([]),
     CustomerModule,
     HttpClientModule,
-    MatSidenavModule
+    MatSidenavModule,
+    SharedModule
   ],
   providers: [],
   bootstrap: [AppComponent]
