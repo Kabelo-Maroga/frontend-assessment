@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {Observable, BehaviorSubject, combineLatest, takeUntil} from 'rxjs';
-import { map, debounceTime } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { QuoteWithCustomer } from '../../models/quote.model';
 import { QuoteFormComponent } from '../quote-form/quote-form.component';
@@ -35,7 +35,6 @@ export class QuoteListComponent extends BaseListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.quoteFacade.loadQuotes();
     this.quoteFacade.loadQuotesWithCustomers();
     this.handleRouteParams();
   }
@@ -50,10 +49,6 @@ export class QuoteListComponent extends BaseListComponent implements OnInit {
 
   onRowClick(quote: QuoteWithCustomer): void {
     this.quoteFacade.selectQuote(quote);
-  }
-
-  onCloseDetails(): void {
-    this.quoteFacade.selectQuote(undefined);
   }
 
   openAddQuoteDialog(): void {

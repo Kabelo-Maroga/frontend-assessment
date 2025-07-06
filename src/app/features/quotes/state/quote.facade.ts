@@ -13,8 +13,6 @@ import { QuoteService } from '../services/quote.service';
 export class QuoteFacade {
   quotesWithCustomers$ = this.store.select(QuoteSelectors.selectQuotesWithCustomers);
   selectedQuote$ = this.store.select(QuoteSelectors.selectSelectedQuote);
-  loading$ = this.store.select(QuoteSelectors.selectQuoteLoading);
-  error$ = this.store.select(QuoteSelectors.selectQuoteError);
 
   constructor(private store: Store, private quoteService: QuoteService) {}
 

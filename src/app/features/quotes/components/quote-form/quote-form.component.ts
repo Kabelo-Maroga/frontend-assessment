@@ -5,7 +5,7 @@ import { Customer } from '../../../customers/models/customer.model';
 import { Quote, QuoteWithCustomer } from '../../models/quote.model';
 import { NotificationService } from '../../../../shared';
 import { QuoteFacade } from '../../state/quote.facade';
-import { BaseFormComponent } from '../../../../shared/components/base-form.component';
+import { BaseFormComponent } from '../../../../shared';
 
 export interface QuoteDialogData {
   quote?: QuoteWithCustomer;
@@ -91,18 +91,17 @@ export class QuoteFormComponent extends BaseFormComponent implements OnInit {
     };
 
     if (this.isEditMode && this.currentQuote) {
-      return { 
-        ...this.currentQuote, 
-        ...baseQuote 
+      return {
+        ...this.currentQuote,
+        ...baseQuote
       };
     }
 
-    // For new quotes, we need to add customer info
     return {
       ...baseQuote,
       id: this.generateId('quote'),
       createdDate: new Date().toISOString().split('T')[0],
-      customerFullName: '', // This will be populated by the service/effects
+      customerFullName: '',
       customer: undefined
     };
   }
