@@ -47,7 +47,7 @@ export class QuoteFormComponent extends BaseFormComponent implements OnInit {
     if (!this.isFormValid()) return;
 
     const quote = this.buildQuote();
-    
+
     if (this.isEditMode) {
       this.updateQuote(quote);
     } else {
@@ -81,7 +81,7 @@ export class QuoteFormComponent extends BaseFormComponent implements OnInit {
     });
   }
 
-  private buildQuote(): Quote {
+  private buildQuote(): QuoteWithCustomer {
     const formValue = this.form.value;
     const baseQuote = {
       customerId: formValue.customerId,
@@ -91,25 +91,31 @@ export class QuoteFormComponent extends BaseFormComponent implements OnInit {
     };
 
     if (this.isEditMode && this.currentQuote) {
-      return { ...this.currentQuote, ...baseQuote };
+      return { 
+        ...this.currentQuote, 
+        ...baseQuote 
+      };
     }
 
+    // For new quotes, we need to add customer info
     return {
       ...baseQuote,
       id: this.generateId('quote'),
-      createdDate: new Date().toISOString().split('T')[0]
+      createdDate: new Date().toISOString().split('T')[0],
+      customerFullName: '', // This will be populated by the service/effects
+      customer: undefined
     };
   }
 
-  private updateQuote(quote: Quote): void {
-    this.quoteFacade.updateQuote(quote);
+  private updateQuote(quoteWithCustomer: QuoteWithCustomer): void {
+    this.quoteFacade.updateQuote(quoteWithCustomer);
     this.notificationService.success('Quote updated successfully!');
-    this.dialogRef.close(quote);
+    this.dialogRef.close(quoteWithCustomer);
   }
 
-  private createQuote(quote: Quote): void {
-    this.quoteFacade.addQuote(quote);
+  private createQuote(quoteWithCustomer: QuoteWithCustomer): void {
+    this.quoteFacade.addQuote(quoteWithCustomer);
     this.notificationService.success('Quote created successfully!');
-    this.dialogRef.close(quote);
+    this.dialogRef.close(quoteWithCustomer);
   }
 }

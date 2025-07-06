@@ -5,9 +5,8 @@ import { ActivatedRoute } from '@angular/router';
 import { QuoteWithCustomer } from '../../models/quote.model';
 import { QuoteFormComponent } from '../quote-form/quote-form.component';
 import { QuoteFacade } from '../../state/quote.facade';
-import { BaseListComponent } from '../../../../shared/components/base-list.component';
 import { MatDialog } from '@angular/material/dialog';
-import { NotificationService } from '../../../../shared';
+import { BaseListComponent, NotificationService } from '../../../../shared';
 
 @Component({
   selector: 'app-quote-list',
@@ -15,7 +14,7 @@ import { NotificationService } from '../../../../shared';
   styleUrls: ['./quote-list.component.scss']
 })
 export class QuoteListComponent extends BaseListComponent implements OnInit {
-  quotes$ = this.quoteFacade.getQuotesWithCustomers();
+  quotesWithCustomers$ = this.quoteFacade.quotesWithCustomers$;
   filteredQuotes$!: Observable<QuoteWithCustomer[]>;
   selectedQuote$ = this.quoteFacade.selectedQuote$;
   displayedColumns = ['customerFullName', 'description', 'amount', 'status', 'createdDate', 'actions'];
@@ -36,7 +35,8 @@ export class QuoteListComponent extends BaseListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.quoteFacade.loadQuotes();
+    // this.quoteFacade.loadQuotes();
+    this.quoteFacade.loadQuotesWithCustomers();
     this.handleRouteParams();
   }
 
@@ -90,8 +90,8 @@ export class QuoteListComponent extends BaseListComponent implements OnInit {
 
   private setupFiltering(): void {
     this.filteredQuotes$ = combineLatest([
-      this.quotes$,
-      this.searchSubject$.pipe(debounceTime(300)),
+      this.quotesWithCustomers$,
+      this.searchSubject$,
       this.statusFilterSubject$
     ]).pipe(
       map(([quotes, searchTerm, statusFilter]) =>

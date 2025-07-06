@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Quote, QuoteWithCustomer } from '../models/quote.model';
 import { Customer } from '../../customers/models/customer.model';
-import { Observable, of, combineLatest } from 'rxjs';
-import { map, delay } from 'rxjs/operators';
+import { Observable, combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -40,18 +40,36 @@ export class QuoteService {
     );
   }
 
-  addQuote(quote: Quote): Observable<Quote> {
-    // In a real app, this would make an HTTP POST request
-    // For now, we'll simulate the API call
-    console.log('Adding new quote:', quote);
-    return of(quote).pipe(delay(300));
+  addQuote(quoteWithCustomer: QuoteWithCustomer): Observable<QuoteWithCustomer> {
+    return this.getCustomers().pipe(
+      map(customers => {
+        const customer = customers.find(c => c.id === quoteWithCustomer.customerId);
+        return {
+          ...quoteWithCustomer,
+          customerFullName: customer ? `${customer.firstName} ${customer.lastName}` : 'Unknown Customer',
+          customer: customer
+        };
+      })
+    );
   }
 
-  updateQuote(quote: Quote): Observable<Quote> {
-    return of(quote).pipe(delay(300));
+  updateQuote(quoteWithCustomer: QuoteWithCustomer): Observable<QuoteWithCustomer> {
+    return this.getCustomers().pipe(
+      map(customers => {
+        const customer = customers.find(c => c.id === quoteWithCustomer.customerId);
+        return {
+          ...quoteWithCustomer,
+          customerFullName: customer ? `${customer.firstName} ${customer.lastName}` : 'Unknown Customer',
+          customer: customer
+        };
+      })
+    );
   }
 
-  deleteQuote(id: string): Observable<void> {
-    return of(undefined).pipe(delay(300));
+  deleteQuote(id: string): Observable<string> {
+    return new Observable(observer => {
+      observer.next(id);
+      observer.complete();
+    });
   }
 }

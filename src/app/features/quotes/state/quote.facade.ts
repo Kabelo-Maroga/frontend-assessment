@@ -11,7 +11,6 @@ import { QuoteService } from '../services/quote.service';
   providedIn: 'root',
 })
 export class QuoteFacade {
-  quotes$ = this.store.select(QuoteSelectors.selectAllQuotes);
   quotesWithCustomers$ = this.store.select(QuoteSelectors.selectQuotesWithCustomers);
   selectedQuote$ = this.store.select(QuoteSelectors.selectSelectedQuote);
   loading$ = this.store.select(QuoteSelectors.selectQuoteLoading);
@@ -19,20 +18,16 @@ export class QuoteFacade {
 
   constructor(private store: Store, private quoteService: QuoteService) {}
 
-  loadQuotes() {
+  loadQuotesWithCustomers() {
     this.store.dispatch(QuoteActions.loadQuotes());
   }
 
-  loadQuotesWithCustomers() {
-    this.store.dispatch(QuoteActions.loadQuotesWithCustomers());
+  addQuote(quoteWithCustomer: QuoteWithCustomer) {
+    this.store.dispatch(QuoteActions.addQuote({ quoteWithCustomer }));
   }
 
-  addQuote(quote: Quote) {
-    this.store.dispatch(QuoteActions.addQuote({ quote }));
-  }
-
-  updateQuote(quote: Quote) {
-    this.store.dispatch(QuoteActions.updateQuote({ quote }));
+  updateQuote(quoteWithCustomer: QuoteWithCustomer) {
+    this.store.dispatch(QuoteActions.updateQuote({ quoteWithCustomer }));
   }
 
   deleteQuote(id: string) {

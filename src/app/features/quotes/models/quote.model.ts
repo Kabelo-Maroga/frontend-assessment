@@ -9,5 +9,5 @@ export interface Quote {
 
 export interface QuoteWithCustomer extends Quote {
   customerFullName: string;
-  customer?: any; // Customer object for additional data
+  customer?: any;
 }

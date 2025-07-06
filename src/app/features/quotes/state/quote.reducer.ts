@@ -3,7 +3,6 @@ import * as QuoteActions from './quote.actions';
 import { Quote, QuoteWithCustomer } from '../models/quote.model';
 
 export interface QuoteState {
-  quotes: Quote[];
   quotesWithCustomers: QuoteWithCustomer[];
   selectedQuote: QuoteWithCustomer | undefined;
   loading: boolean;
@@ -11,7 +10,6 @@ export interface QuoteState {
 }
 
 export const initialState: QuoteState = {
-  quotes: [],
   quotesWithCustomers: [],
   selectedQuote: undefined,
   loading: false,
@@ -26,44 +24,51 @@ export const quoteReducer = createReducer(
     loading: true,
     error: null,
   })),
-  on(QuoteActions.loadQuotesSuccess, (state, { quotes }) => ({
+
+  on(QuoteActions.loadQuotesSuccess, (state, { quotesWithCustomers }) => ({
     ...state,
-    quotes,
+    quotesWithCustomers,
     loading: false,
+    error: null,
   })),
+
   on(QuoteActions.loadQuotesFailure, (state, { error }) => ({
     ...state,
     loading: false,
     error,
   })),
 
-  on(QuoteActions.loadQuotesWithCustomers, (state) => ({
+  on(QuoteActions.addQuoteSuccess, (state, { quoteWithCustomer }) => ({
     ...state,
-    loading: true,
+    quotesWithCustomers: [...state.quotesWithCustomers, quoteWithCustomer],
     error: null,
   })),
-  on(QuoteActions.loadQuotesWithCustomersSuccess, (state, { quotesWithCustomers }) => ({
+
+  on(QuoteActions.addQuoteFailure, (state, { error }) => ({
     ...state,
-    quotesWithCustomers,
-    loading: false,
-  })),
-  on(QuoteActions.loadQuotesWithCustomersFailure, (state, { error }) => ({
-    ...state,
-    loading: false,
     error,
   })),
 
-  on(QuoteActions.addQuoteSuccess, (state, { quote }) => ({
+  on(QuoteActions.updateQuoteSuccess, (state, { quoteWithCustomer }) => ({
     ...state,
-    quotes: [...state.quotes, quote],
+    quotesWithCustomers: state.quotesWithCustomers.map((q) => (q.id === quoteWithCustomer.id ? quoteWithCustomer : q)),
+    error: null,
   })),
-  on(QuoteActions.updateQuoteSuccess, (state, { quote }) => ({
+
+  on(QuoteActions.updateQuoteFailure, (state, { error }) => ({
     ...state,
-    quotes: state.quotes.map((q) => (q.id === quote.id ? quote : q)),
+    error,
   })),
+
   on(QuoteActions.deleteQuoteSuccess, (state, { id }) => ({
     ...state,
-    quotes: state.quotes.filter((q) => q.id !== id),
+    quotesWithCustomers: state.quotesWithCustomers.filter((q) => q.id !== id),
+    error: null,
+  })),
+
+  on(QuoteActions.deleteQuoteFailure, (state, { error }) => ({
+    ...state,
+    error,
   })),
 
   on(QuoteActions.selectQuote, (state, { quote }) => ({
