@@ -26,13 +26,11 @@ export const quoteReducer = createReducer(
     loading: true,
     error: null,
   })),
-
   on(QuoteActions.loadQuotesSuccess, (state, { quotes }) => ({
     ...state,
     quotes,
     loading: false,
   })),
-
   on(QuoteActions.loadQuotesFailure, (state, { error }) => ({
     ...state,
     loading: false,
@@ -44,13 +42,11 @@ export const quoteReducer = createReducer(
     loading: true,
     error: null,
   })),
-
   on(QuoteActions.loadQuotesWithCustomersSuccess, (state, { quotesWithCustomers }) => ({
     ...state,
     quotesWithCustomers,
     loading: false,
   })),
-
   on(QuoteActions.loadQuotesWithCustomersFailure, (state, { error }) => ({
     ...state,
     loading: false,
@@ -61,12 +57,10 @@ export const quoteReducer = createReducer(
     ...state,
     quotes: [...state.quotes, quote],
   })),
-
   on(QuoteActions.updateQuoteSuccess, (state, { quote }) => ({
     ...state,
     quotes: state.quotes.map((q) => (q.id === quote.id ? quote : q)),
   })),
-
   on(QuoteActions.deleteQuoteSuccess, (state, { id }) => ({
     ...state,
     quotes: state.quotes.filter((q) => q.id !== id),

@@ -16,7 +16,7 @@ export abstract class BaseListComponent extends SafeUnsubscribe {
     super();
   }
 
-  protected openDialog(
+  protected openDialog<T>(
     component: any,
     config: any = {},
     successMessage: string = 'Operation completed successfully'
