@@ -41,29 +41,17 @@ export class QuoteService {
   }
 
   addQuote(quoteWithCustomer: QuoteWithCustomer): Observable<QuoteWithCustomer> {
-    return this.getCustomers().pipe(
-      map(customers => {
-        const customer = customers.find(c => c.id === quoteWithCustomer.customerId);
-        return {
-          ...quoteWithCustomer,
-          customerFullName: customer ? `${customer.firstName} ${customer.lastName}` : 'Unknown Customer',
-          customer: customer
-        };
-      })
-    );
+    return new Observable(observer => {
+      observer.next(quoteWithCustomer);
+      observer.complete();
+    });
   }
 
   updateQuote(quoteWithCustomer: QuoteWithCustomer): Observable<QuoteWithCustomer> {
-    return this.getCustomers().pipe(
-      map(customers => {
-        const customer = customers.find(c => c.id === quoteWithCustomer.customerId);
-        return {
-          ...quoteWithCustomer,
-          customerFullName: customer ? `${customer.firstName} ${customer.lastName}` : 'Unknown Customer',
-          customer: customer
-        };
-      })
-    );
+    return new Observable(observer => {
+      observer.next(quoteWithCustomer);
+      observer.complete();
+    });
   }
 
   deleteQuote(id: string): Observable<string> {

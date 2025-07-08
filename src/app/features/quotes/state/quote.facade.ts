@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import * as QuoteActions from './quote.actions';
+import * as CustomerActions from '../../customers/state/customer.selectors';
 import * as QuoteSelectors from './quote.selectors';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Quote, QuoteWithCustomer } from '../models/quote.model';
+import { QuoteWithCustomer } from '../models/quote.model';
 import { QuoteService } from '../services/quote.service';
 
 @Injectable({
@@ -13,6 +14,7 @@ import { QuoteService } from '../services/quote.service';
 export class QuoteFacade {
   quotesWithCustomers$ = this.store.select(QuoteSelectors.selectQuotesWithCustomers);
   selectedQuote$ = this.store.select(QuoteSelectors.selectSelectedQuote);
+  customers$ = this.store.select(CustomerActions.selectAllCustomers);
 
   constructor(private store: Store, private quoteService: QuoteService) {}
 
@@ -38,10 +40,6 @@ export class QuoteFacade {
 
   getQuotesWithCustomers(): Observable<QuoteWithCustomer[]> {
     return this.quoteService.getQuotesWithCustomers();
-  }
-
-  getCustomers() {
-    return this.quoteService.getCustomers();
   }
 
   getQuotesForCustomer(customerId: string): Observable<QuoteWithCustomer[]> {

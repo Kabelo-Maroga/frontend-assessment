@@ -2,7 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Customer } from '../../../customers/models/customer.model';
-import { Quote, QuoteWithCustomer } from '../../models/quote.model';
+import { QuoteWithCustomer } from '../../models/quote.model';
 import { NotificationService } from '../../../../shared';
 import { QuoteFacade } from '../../state/quote.facade';
 import { BaseFormComponent } from '../../../../shared';
@@ -19,10 +19,11 @@ export interface QuoteDialogData {
 })
 export class QuoteFormComponent extends BaseFormComponent implements OnInit {
   form: FormGroup;
-  customers$ = this.quoteFacade.getCustomers();
+  customers$ = this.quoteFacade.customers$;
   statusOptions = ['Pending', 'Approved', 'Declined'];
   isEditMode = false;
   currentQuote?: QuoteWithCustomer;
+  selectedCustomer?: Customer;
 
   constructor(
     private fb: FormBuilder,
@@ -47,6 +48,7 @@ export class QuoteFormComponent extends BaseFormComponent implements OnInit {
     if (!this.isFormValid()) return;
 
     const quote = this.buildQuote();
+    console.log("quote ---- ", quote);
 
     if (this.isEditMode) {
       this.updateQuote(quote);
@@ -61,6 +63,11 @@ export class QuoteFormComponent extends BaseFormComponent implements OnInit {
 
   getCustomerDisplayName(customer: Customer): string {
     return `${customer.firstName} ${customer.lastName}`;
+  }
+
+  onSelectionChange(customer: Customer): void {
+    console.log("customer --- ", customer);
+    this.selectedCustomer = customer;
   }
 
   private createForm(): FormGroup {
@@ -87,7 +94,7 @@ export class QuoteFormComponent extends BaseFormComponent implements OnInit {
       customerId: formValue.customerId,
       amount: formValue.amount,
       status: formValue.status,
-      description: formValue.description
+      description: formValue.description,
     };
 
     if (this.isEditMode && this.currentQuote) {
@@ -101,8 +108,8 @@ export class QuoteFormComponent extends BaseFormComponent implements OnInit {
       ...baseQuote,
       id: this.generateId('quote'),
       createdDate: new Date().toISOString().split('T')[0],
-      customerFullName: '',
-      customer: undefined
+      customer: this.selectedCustomer,
+      customerFullName: this.selectedCustomer ? this.getCustomerDisplayName(this.selectedCustomer) : ''
     };
   }
 

@@ -2,21 +2,34 @@ import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { QuoteService } from '../services/quote.service';
 import * as QuoteActions from './quote.actions';
-import { catchError, map, mergeMap, of, switchMap } from 'rxjs';
+import { catchError, map, mergeMap, of, switchMap, withLatestFrom } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { selectQuotesWithCustomers } from './quote.selectors';
 
 @Injectable()
 export class QuoteEffects {
-  constructor(private actions$: Actions, private quoteService: QuoteService) {}
+  constructor(
+    private actions$: Actions,
+    private quoteService: QuoteService,
+    private store: Store
+  ) {}
 
   loadQuotesWithCustomers$ = createEffect(() =>
     this.actions$.pipe(
       ofType(QuoteActions.loadQuotes),
-      mergeMap(() =>
-        this.quoteService.getQuotesWithCustomers().pipe(
+      withLatestFrom(this.store.select(selectQuotesWithCustomers)),
+      switchMap(([_, quotesWithCustomers]) => {
+        // If there are already quotes in the store, don't fetch them again
+        if (quotesWithCustomers && quotesWithCustomers.length > 0) {
+          return of(QuoteActions.loadQuotesSuccess({ quotesWithCustomers }));
+        }
+
+        // Otherwise, fetch from service
+        return this.quoteService.getQuotesWithCustomers().pipe(
           map((quotesWithCustomers) => QuoteActions.loadQuotesSuccess({ quotesWithCustomers })),
           catchError((error) => of(QuoteActions.loadQuotesFailure({ error })))
-        )
-      )
+        );
+      })
     )
   );
 

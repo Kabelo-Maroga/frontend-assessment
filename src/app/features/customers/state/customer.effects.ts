@@ -2,21 +2,34 @@ import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { CustomerService } from '../services/customer.service';
 import * as CustomerActions from './customer.actions';
-import { catchError, map, mergeMap, of } from 'rxjs';
+import { catchError, map, mergeMap, of, withLatestFrom, filter, switchMap } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { selectAllCustomers } from './customer.selectors';
 
 @Injectable()
 export class CustomerEffects {
-  constructor(private actions$: Actions, private customerService: CustomerService) {}
+  constructor(
+    private actions$: Actions,
+    private customerService: CustomerService,
+    private store: Store
+  ) {}
 
   loadCustomers$ = createEffect(() =>
     this.actions$.pipe(
       ofType(CustomerActions.loadCustomers),
-      mergeMap(() =>
-        this.customerService.getCustomers().pipe(
+      withLatestFrom(this.store.select(selectAllCustomers)),
+      switchMap(([_, customers]) => {
+        // If there are already customers in the store, don't fetch them again
+        if (customers && customers.length > 0) {
+          return of(CustomerActions.loadCustomersSuccess({ customers }));
+        }
+
+        // Otherwise, fetch from service
+        return this.customerService.getCustomers().pipe(
           map(customers => CustomerActions.loadCustomersSuccess({ customers })),
           catchError(error => of(CustomerActions.loadCustomersFailure({ error })))
-        )
-      )
+        );
+      })
     )
   );
 
