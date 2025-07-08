@@ -3,13 +3,14 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { CustomerFacade } from '../../state/customer.facade';
 import { Customer } from '../../models/customer.model';
+import {BaseFormComponent} from "../../../../shared";
 
 @Component({
   selector: 'app-customer-form',
   templateUrl: './customer-form.component.html',
   styleUrls: ['./customer-form.component.scss']
 })
-export class CustomerFormComponent implements OnInit {
+export class CustomerFormComponent extends BaseFormComponent implements OnInit {
   form: FormGroup;
   isEditMode = false;
   customer?: Customer;
@@ -20,6 +21,7 @@ export class CustomerFormComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<CustomerFormComponent>
   ) {
+    super();
     this.isEditMode = data?.isEdit || false;
     this.customer = data?.customer;
     this.form = this.initForm();
@@ -30,10 +32,7 @@ export class CustomerFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (!this.form.valid) {
-      this.markFormGroupTouched();
-      return;
-    }
+    if (!this.isFormValid()) return;
 
     const customer = this.isEditMode ?
       this.createUpdatedCustomer() :
@@ -108,18 +107,6 @@ export class CustomerFormComponent implements OnInit {
       city: ['', Validators.required],
       suburb: ['', Validators.required],
       postalCode: ['', [Validators.required]]
-    });
-  }
-
-  private generateId(prefix: string): string {
-    const timestamp = Date.now();
-    return `${prefix}-${timestamp}`;
-  }
-
-  private markFormGroupTouched(): void {
-    Object.keys(this.form.controls).forEach(key => {
-      const control = this.form.get(key);
-      control?.markAsTouched();
     });
   }
 }
