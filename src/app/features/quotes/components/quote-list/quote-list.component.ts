@@ -1,12 +1,21 @@
 import { Component, OnInit } from '@angular/core';
-import {Observable, BehaviorSubject, combineLatest, takeUntil} from 'rxjs';
+import { Observable, BehaviorSubject, combineLatest, takeUntil, filter } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { QuoteWithCustomer } from '../../models/quote.model';
 import { QuoteFormComponent } from '../quote-form/quote-form.component';
 import { QuoteFacade } from '../../state/quote.facade';
 import { MatDialog } from '@angular/material/dialog';
-import { BaseListComponent, NotificationService } from '../../../../shared';
+import { BaseListComponent, NotificationService, DialogService } from '../../../../shared';
+
+interface QuoteDialogConfig {
+  width: string;
+  disableClose: boolean;
+  data?: {
+    quote?: QuoteWithCustomer;
+    isEdit?: boolean;
+  };
+}
 
 @Component({
   selector: 'app-quote-list',
@@ -17,7 +26,7 @@ export class QuoteListComponent extends BaseListComponent implements OnInit {
   readonly quotesWithCustomers$ = this.quoteFacade.quotesWithCustomers$;
   readonly selectedQuote$ = this.quoteFacade.selectedQuote$;
   readonly displayedColumns = ['customerFullName', 'description', 'amount', 'status', 'createdDate', 'actions'];
-  readonly statusOptions = ['', 'Pending', 'Approved', 'Declined'];
+  readonly statusOptions = ['', 'Pending', 'Approved', 'Declined'] as const;
 
   filteredQuotes$!: Observable<QuoteWithCustomer[]>;
 
@@ -29,7 +38,8 @@ export class QuoteListComponent extends BaseListComponent implements OnInit {
     private quoteFacade: QuoteFacade,
     private route: ActivatedRoute,
     dialog: MatDialog,
-    notificationService: NotificationService
+    notificationService: NotificationService,
+    private dialogService: DialogService
   ) {
     super(dialog, notificationService);
     this.initFilteredQuotes();
@@ -37,7 +47,7 @@ export class QuoteListComponent extends BaseListComponent implements OnInit {
 
   ngOnInit(): void {
     this.quoteFacade.loadQuotes();
-    this.handleRouteParams();
+    this.subscribeToRouteParams();
   }
 
   onSearch(value: string): void {
@@ -53,70 +63,93 @@ export class QuoteListComponent extends BaseListComponent implements OnInit {
   }
 
   openAddQuoteDialog(): void {
-    this.openDialog(QuoteFormComponent, {
-      width: '500px',
-      disableClose: false
-    }, 'Quote created successfully!');
+    const config = this.createDialogConfig();
+    this.openQuoteDialog(config, 'Quote created successfully!');
   }
 
   openEditQuoteDialog(quote: QuoteWithCustomer): void {
-    this.openDialog(QuoteFormComponent, {
-      width: '500px',
-      disableClose: false,
-      data: { quote, isEdit: true }
-    }, 'Quote updated successfully!');
+    const config = this.createDialogConfig({ quote, isEdit: true });
+    this.openQuoteDialog(config, 'Quote updated successfully!');
   }
 
   deleteQuote(quote: QuoteWithCustomer): void {
-    const message = `Are you sure you want to delete the quote for ${quote.customerFullName}?`;
-    this.confirmDelete(message, () => {
-      this.quoteFacade.deleteQuote(quote.id);
-      this.notificationService.success('Quote deleted successfully!');
+    this.showDeleteConfirmation(quote).pipe(
+      filter(Boolean),
+      takeUntil(this._ngUnsubscribe)
+    ).subscribe(() => this.handleQuoteDeletion(quote));
+  }
+
+  private createDialogConfig(data?: QuoteDialogConfig['data']): QuoteDialogConfig {
+    return {
+      width: '500px',
+      disableClose: false,
+      ...(data && { data })
+    };
+  }
+
+  private openQuoteDialog(config: QuoteDialogConfig, successMessage: string): void {
+    this.openDialog(QuoteFormComponent, config, successMessage);
+  }
+
+  private showDeleteConfirmation(quote: QuoteWithCustomer): Observable<boolean> {
+    return this.dialogService.confirm({
+      message: `Are you sure you want to delete the quote for ${quote.customerFullName}?`,
+      entity: quote
     });
   }
 
-  private handleRouteParams(): void {
+  private handleQuoteDeletion(quote: QuoteWithCustomer): void {
+    this.quoteFacade.deleteQuote(quote.id);
+    this.notificationService.success('Quote deleted successfully!');
+  }
+
+  private subscribeToRouteParams(): void {
     this.route.queryParams
       .pipe(takeUntil(this._ngUnsubscribe))
-      .subscribe(params => {
-      this.selectedCustomerId = params['customerId'] || null;
-      this.initFilteredQuotes();
-    });
+      .subscribe(params => this.handleQueryParams(params));
+  }
+
+  private handleQueryParams(params: any): void {
+    this.selectedCustomerId = params['customerId'] || null;
+    this.initFilteredQuotes();
   }
 
   private initFilteredQuotes(): void {
-    this.filteredQuotes$ = combineLatest([
+    this.filteredQuotes$ = this.createFilteredQuotes$();
+  }
+
+  private createFilteredQuotes$(): Observable<QuoteWithCustomer[]> {
+    return combineLatest([
       this.quotesWithCustomers$,
       this.searchSubject$,
       this.statusFilterSubject$
     ]).pipe(
       map(([quotes, searchTerm, statusFilter]) =>
-        this.filterQuotes(quotes, searchTerm, statusFilter)
+        this.applyFilters(quotes, searchTerm, statusFilter)
       )
     );
   }
 
-  private filterQuotes(
+  private applyFilters(
     quotes: QuoteWithCustomer[],
     searchTerm: string,
     statusFilter: string
   ): QuoteWithCustomer[] {
-    let filtered = quotes;
+    return quotes
+      .filter(quote => this.filterByCustomerId(quote))
+      .filter(quote => this.filterBySearchTerm(quote, searchTerm))
+      .filter(quote => this.filterByStatus(quote, statusFilter));
+  }
 
-    if (this.selectedCustomerId) {
-      filtered = filtered.filter(quote => quote.customerId === this.selectedCustomerId);
-    }
+  private filterByCustomerId(quote: QuoteWithCustomer): boolean {
+    return !this.selectedCustomerId || quote.customerId === this.selectedCustomerId;
+  }
 
-    if (searchTerm) {
-      filtered = filtered.filter(quote =>
-        quote.customerFullName.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
+  private filterBySearchTerm(quote: QuoteWithCustomer, searchTerm: string): boolean {
+    return !searchTerm || quote.customerFullName.toLowerCase().includes(searchTerm.toLowerCase());
+  }
 
-    if (statusFilter) {
-      filtered = filtered.filter(quote => quote.status === statusFilter);
-    }
-
-    return filtered;
+  private filterByStatus(quote: QuoteWithCustomer, statusFilter: string): boolean {
+    return !statusFilter || quote.status === statusFilter;
   }
 }
