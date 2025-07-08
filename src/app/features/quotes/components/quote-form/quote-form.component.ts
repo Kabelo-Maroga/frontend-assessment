@@ -2,7 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Customer } from '../../../customers/models/customer.model';
-import { QuoteWithCustomer } from '../../models/quote.model';
+import { QuoteWithCustomer, QuoteStatus } from '../../models/quote.model';
 import { NotificationService } from '../../../../shared';
 import { QuoteFacade } from '../../state/quote.facade';
 import { BaseFormComponent } from '../../../../shared';
@@ -19,7 +19,7 @@ export interface QuoteDialogData {
 })
 export class QuoteFormComponent extends BaseFormComponent implements OnInit {
   readonly customers$ = this.quoteFacade.customers$;
-  readonly statusOptions = ['Pending', 'Approved', 'Declined'];
+  readonly statusOptions = [QuoteStatus.Pending, QuoteStatus.Approved, QuoteStatus.Declined];
   readonly currentQuote?: QuoteWithCustomer;
 
   form: FormGroup;

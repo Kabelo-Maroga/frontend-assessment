@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Observable, BehaviorSubject, combineLatest, takeUntil, filter } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
-import { QuoteWithCustomer } from '../../models/quote.model';
+import { QuoteWithCustomer, QuoteStatus } from '../../models/quote.model';
 import { QuoteFormComponent } from '../quote-form/quote-form.component';
 import { QuoteFacade } from '../../state/quote.facade';
 import { MatDialog } from '@angular/material/dialog';
@@ -26,7 +26,7 @@ export class QuoteListComponent extends BaseListComponent implements OnInit {
   readonly quotesWithCustomers$ = this.quoteFacade.quotesWithCustomers$;
   readonly selectedQuote$ = this.quoteFacade.selectedQuote$;
   readonly displayedColumns = ['customerFullName', 'description', 'amount', 'status', 'createdDate', 'actions'];
-  readonly statusOptions = ['', 'Pending', 'Approved', 'Declined'] as const;
+  readonly statusOptions = ['', QuoteStatus.Pending, QuoteStatus.Approved, QuoteStatus.Declined];
 
   filteredQuotes$!: Observable<QuoteWithCustomer[]>;
 
@@ -150,6 +150,6 @@ export class QuoteListComponent extends BaseListComponent implements OnInit {
   }
 
   private filterByStatus(quote: QuoteWithCustomer, statusFilter: string): boolean {
-    return !statusFilter || quote.status === statusFilter;
+    return !statusFilter || quote.status === statusFilter as QuoteStatus;
   }
 }

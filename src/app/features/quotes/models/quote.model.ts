@@ -1,8 +1,14 @@
+export enum QuoteStatus {
+  Pending = 'Pending',
+  Approved = 'Approved',
+  Declined = 'Declined'
+}
+
 export interface Quote {
   id: string;
   customerId: string;
   amount: number;
-  status: 'Pending' | 'Approved' | 'Declined';
+  status: QuoteStatus;
   createdDate: string;
   description: string;
 }
