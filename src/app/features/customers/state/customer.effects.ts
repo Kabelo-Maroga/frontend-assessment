@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { CustomerService } from '../services/customer.service';
 import * as CustomerActions from './customer.actions';
-import { catchError, map, mergeMap, of, withLatestFrom, filter, switchMap } from 'rxjs';
+import { catchError, map, of, withLatestFrom, switchMap } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { selectAllCustomers } from './customer.selectors';
 
@@ -24,7 +24,7 @@ export class CustomerEffects {
           return of(CustomerActions.loadCustomersSuccess({ customers }));
         }
 
-        // Otherwise, fetch from service
+        // Otherwise, fetch from servr
         return this.customerService.getCustomers().pipe(
           map(customers => CustomerActions.loadCustomersSuccess({ customers })),
           catchError(error => of(CustomerActions.loadCustomersFailure({ error })))
@@ -36,7 +36,7 @@ export class CustomerEffects {
   addCustomer$ = createEffect(() =>
     this.actions$.pipe(
       ofType(CustomerActions.addCustomer),
-      mergeMap(action =>
+      switchMap(action =>
         this.customerService.addCustomer(action.customer).pipe(
           map(customer => CustomerActions.addCustomerSuccess({ customer })),
           catchError(error => of(CustomerActions.addCustomerFailure({ error })))
@@ -48,7 +48,7 @@ export class CustomerEffects {
   updateCustomer$ = createEffect(() =>
     this.actions$.pipe(
       ofType(CustomerActions.updateCustomer),
-      mergeMap(action =>
+      switchMap(action =>
         this.customerService.updateCustomer(action.customer).pipe(
           map(customer => CustomerActions.updateCustomerSuccess({ customer })),
           catchError(error => of(CustomerActions.updateCustomerFailure({ error })))
@@ -60,7 +60,7 @@ export class CustomerEffects {
   deleteCustomer$ = createEffect(() =>
     this.actions$.pipe(
       ofType(CustomerActions.deleteCustomer),
-      mergeMap(action =>
+      switchMap(action =>
         this.customerService.deleteCustomer(action.customerId).pipe(
           map(() => CustomerActions.deleteCustomerSuccess({ customerId: action.customerId })),
           catchError(error => of(CustomerActions.deleteCustomerFailure({ error })))

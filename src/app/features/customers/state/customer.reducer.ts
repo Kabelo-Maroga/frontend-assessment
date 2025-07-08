@@ -1,28 +1,32 @@
 import { createReducer, on } from '@ngrx/store';
 import { Customer } from '../models/customer.model';
 import * as CustomerActions from './customer.actions';
-import {selectedCustomer} from "./customer.selectors";
 
 export interface CustomerState {
   selectedCustomer: Customer | undefined;
   customers: Customer[];
   loading: boolean;
+  error: any;
 }
 
 export const initialState: CustomerState = {
   selectedCustomer: undefined,
   customers: [],
   loading: false,
+  error: null
 };
 
 export const customerReducer = createReducer(
   initialState,
   on(CustomerActions.loadCustomers, state => ({
-    ...state, loading: true
+    ...state,
+    loading: true
   })),
 
   on(CustomerActions.loadCustomersSuccess, (state, { customers }) => ({
-    ...state, loading: false, customers
+    ...state,
+    loading: false,
+    customers
   })),
 
   on(CustomerActions.addCustomerSuccess, (state, { customer }) => ({
@@ -44,6 +48,12 @@ export const customerReducer = createReducer(
   on(CustomerActions.selectCustomer, (state, { selectedCustomer }) => ({
     ...state,
     selectedCustomer
+  })),
+
+  on(CustomerActions.loadCustomersFailure, (state, { error }) => ({
+    ...state,
+    loading: false,
+    error
   }))
 );
 

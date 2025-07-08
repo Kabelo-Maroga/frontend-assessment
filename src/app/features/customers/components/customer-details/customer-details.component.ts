@@ -1,7 +1,5 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Customer } from '../../models/customer.model';
+import {Component, EventEmitter, Output} from '@angular/core';
 import {CustomerFacade} from "../../state/customer.facade";
-import {selectedCustomer} from "../../state/customer.selectors";
 
 @Component({
   selector: 'app-customer-details',
@@ -9,10 +7,11 @@ import {selectedCustomer} from "../../state/customer.selectors";
   styleUrls: ['./customer-details.component.scss']
 })
 export class CustomerDetailsComponent {
-  selectedCustomer$ = this.customerFacade.selectedCustomer$;
-  @Output() close = new EventEmitter<void>();
+  readonly selectedCustomer$ = this.customerFacade.selectedCustomer$;
+  @Output() readonly close = new EventEmitter<void>();
 
-  constructor(private customerFacade: CustomerFacade) {}
+  constructor(private customerFacade: CustomerFacade) {
+  }
 
   onClose(): void {
     this.close.emit();
