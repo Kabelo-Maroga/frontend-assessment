@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CustomerFacade } from '../../state/customer.facade';
 import { Customer } from '../../models/customer.model';
@@ -8,6 +8,7 @@ import {
   ConfirmMessages,
   TableColumns,
   SafeUnsubscribe,
+  GridUtils
 } from "../../../../shared";
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -19,7 +20,7 @@ import { MatDialog } from '@angular/material/dialog';
   templateUrl: './customer-list.component.html',
   styleUrls: ['./customer-list.component.scss']
 })
-export class CustomerListComponent extends SafeUnsubscribe implements OnInit {
+export class CustomerListComponent extends SafeUnsubscribe implements OnInit, AfterViewInit {
   readonly displayedColumns = [
     TableColumns.CUSTOMER.FIRST_NAME,
     TableColumns.CUSTOMER.LAST_NAME,
@@ -47,7 +48,21 @@ export class CustomerListComponent extends SafeUnsubscribe implements OnInit {
   ngOnInit(): void {
     this.customerFacade.loadCustomers();
     this.filteredCustomers$ = this.initFilteredCustomers$();
-    this.initGridDataSource();
+
+    GridUtils.subscribeToDataSource(
+      this.dataSource,
+      this.filteredCustomers$,
+      this._ngUnsubscribe
+    );
+  }
+
+  ngAfterViewInit(): void {
+    GridUtils.setupSort(
+      this.dataSource,
+      this.sort,
+      TableColumns.CUSTOMER.LAST_NAME,
+      'asc'
+    );
   }
 
   openAddCustomerDialog(): void {
@@ -121,16 +136,5 @@ export class CustomerListComponent extends SafeUnsubscribe implements OnInit {
 
   private isMatchingName(name: string, searchKey: string): boolean {
     return name.toLowerCase().includes(searchKey);
-  }
-
-  private initGridDataSource(): void {
-    this.filteredCustomers$?.pipe(
-      takeUntil(this._ngUnsubscribe)
-    ).subscribe(customers => {
-      this.dataSource.data = customers;
-      if (this.sort) {
-        this.dataSource.sort = this.sort;
-      }
-    });
   }
 }

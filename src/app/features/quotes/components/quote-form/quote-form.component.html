@@ -19,7 +19,7 @@
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Description</mat-label>
         <textarea matInput formControlName="description" required rows="3"
-                  placeholder="Describe the project or service..."></textarea>
+                  placeholder="Quote descriptson..."></textarea>
         <mat-error *ngIf="form.get('description')?.hasError('required') && form.get('description')?.touched">
           Description is required
         </mat-error>

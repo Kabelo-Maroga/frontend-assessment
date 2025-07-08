@@ -13,3 +13,5 @@ export * from './shared.module';
 
 export * from './constants/notification-messages';
 export * from './constants/ui-constants';
+
+export * from './utils/grid-utils';

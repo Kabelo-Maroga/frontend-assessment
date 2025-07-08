@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { Observable, BehaviorSubject, combineLatest, takeUntil, filter } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
@@ -13,7 +13,9 @@ import {
   ConfirmMessages,
   TableColumns,
   RouteParams,
-  DialogConfig, SafeUnsubscribe
+  DialogConfig,
+  SafeUnsubscribe,
+  GridUtils
 } from '../../../../shared';
 
 interface QuoteDialogConfig {
@@ -30,7 +32,7 @@ interface QuoteDialogConfig {
   templateUrl: './quote-list.component.html',
   styleUrls: ['./quote-list.component.scss']
 })
-export class QuoteListComponent extends SafeUnsubscribe implements OnInit {
+export class QuoteListComponent extends SafeUnsubscribe implements OnInit, AfterViewInit {
   readonly quotesWithCustomers$ = this.quoteFacade.quotesWithCustomers$;
   readonly selectedQuote$ = this.quoteFacade.selectedQuote$;
   readonly statusOptions = ['', QuoteStatus.Pending, QuoteStatus.Approved, QuoteStatus.Declined];
@@ -65,7 +67,21 @@ export class QuoteListComponent extends SafeUnsubscribe implements OnInit {
   ngOnInit(): void {
     this.quoteFacade.loadQuotes();
     this.subscribeToRouteParams();
-    this.initGridDataSource();
+
+    GridUtils.subscribeToDataSource(
+      this.dataSource,
+      this.filteredQuotes$,
+      this._ngUnsubscribe
+    );
+  }
+
+  ngAfterViewInit(): void {
+    GridUtils.setupSort(
+      this.dataSource,
+      this.sort,
+      TableColumns.QUOTE.CREATED_DATE,
+      'desc'
+    );
   }
 
   onSearch(value: string): void {
@@ -168,16 +184,5 @@ export class QuoteListComponent extends SafeUnsubscribe implements OnInit {
 
   private filterByStatus(quote: QuoteWithCustomer, statusFilter: string): boolean {
     return !statusFilter || quote.status === statusFilter as QuoteStatus;
-  }
-
-  private initGridDataSource(): void {
-    this.filteredQuotes$?.pipe(
-      takeUntil(this._ngUnsubscribe)
-    ).subscribe(quotes => {
-      this.dataSource.data = quotes || [];
-      if (this.sort) {
-        this.dataSource.sort = this.sort;
-      }
-    });
   }
 }
