@@ -6,7 +6,16 @@ import { QuoteWithCustomer, QuoteStatus } from '../../models/quote.model';
 import { QuoteFormComponent } from '../quote-form/quote-form.component';
 import { QuoteFacade } from '../../state/quote.facade';
 import { MatDialog } from '@angular/material/dialog';
-import { BaseListComponent, NotificationService, DialogService } from '../../../../shared';
+import {
+  BaseListComponent,
+  NotificationService,
+  DialogService,
+  SuccessMessages,
+  ConfirmMessages,
+  TableColumns,
+  RouteParams,
+  DialogConfig
+} from '../../../../shared';
 
 interface QuoteDialogConfig {
   width: string;
@@ -25,8 +34,15 @@ interface QuoteDialogConfig {
 export class QuoteListComponent extends BaseListComponent implements OnInit {
   readonly quotesWithCustomers$ = this.quoteFacade.quotesWithCustomers$;
   readonly selectedQuote$ = this.quoteFacade.selectedQuote$;
-  readonly displayedColumns = ['customerFullName', 'description', 'amount', 'status', 'createdDate', 'actions'];
   readonly statusOptions = ['', QuoteStatus.Pending, QuoteStatus.Approved, QuoteStatus.Declined];
+  readonly displayedColumns = [
+    TableColumns.QUOTE.CUSTOMER_FULL_NAME,
+    TableColumns.QUOTE.DESCRIPTION,
+    TableColumns.QUOTE.AMOUNT,
+    TableColumns.QUOTE.STATUS,
+    TableColumns.QUOTE.CREATED_DATE,
+    TableColumns.QUOTE.ACTIONS
+  ];
 
   filteredQuotes$!: Observable<QuoteWithCustomer[]>;
 
@@ -64,12 +80,12 @@ export class QuoteListComponent extends BaseListComponent implements OnInit {
 
   openAddQuoteDialog(): void {
     const config = this.createDialogConfig();
-    this.openQuoteDialog(config, 'Quote created successfully!');
+    this.openQuoteDialog(config, SuccessMessages.QUOTE_ADDED);
   }
 
   openEditQuoteDialog(quote: QuoteWithCustomer): void {
     const config = this.createDialogConfig({ quote, isEdit: true });
-    this.openQuoteDialog(config, 'Quote updated successfully!');
+    this.openQuoteDialog(config, SuccessMessages.QUOTE_UPDATED);
   }
 
   deleteQuote(quote: QuoteWithCustomer): void {
@@ -81,7 +97,7 @@ export class QuoteListComponent extends BaseListComponent implements OnInit {
 
   private createDialogConfig(data?: QuoteDialogConfig['data']): QuoteDialogConfig {
     return {
-      width: '500px',
+      width: DialogConfig.DEFAULT_WIDTH,
       disableClose: false,
       ...(data && { data })
     };
@@ -93,14 +109,14 @@ export class QuoteListComponent extends BaseListComponent implements OnInit {
 
   private showDeleteConfirmation(quote: QuoteWithCustomer): Observable<boolean> {
     return this.dialogService.confirm({
-      message: `Are you sure you want to delete the quote for ${quote.customerFullName}?`,
+      message: ConfirmMessages.DELETE_QUOTE(quote.customerFullName),
       entity: quote
     });
   }
 
   private handleQuoteDeletion(quote: QuoteWithCustomer): void {
     this.quoteFacade.deleteQuote(quote.id);
-    this.notificationService.success('Quote deleted successfully!');
+    this.notificationService.success(SuccessMessages.QUOTE_DELETED);
   }
 
   private subscribeToRouteParams(): void {
@@ -110,7 +126,7 @@ export class QuoteListComponent extends BaseListComponent implements OnInit {
   }
 
   private handleQueryParams(params: any): void {
-    this.selectedCustomerId = params['customerId'] || null;
+    this.selectedCustomerId = params[RouteParams.CUSTOMER_ID] || null;
     this.initFilteredQuotes();
   }
 

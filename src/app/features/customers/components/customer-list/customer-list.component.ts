@@ -3,11 +3,18 @@ import { Router } from '@angular/router';
 import { CustomerFacade } from '../../state/customer.facade';
 import { Customer } from '../../models/customer.model';
 import { BehaviorSubject, combineLatest, map, Observable, takeUntil, filter } from 'rxjs';
-import { DialogService } from "../../../../shared";
-import { NotificationService } from "../../../../shared";
+import { 
+  BaseListComponent,
+  DialogService, 
+  NotificationService, 
+  SuccessMessages, 
+  ConfirmMessages,
+  TableColumns,
+  RouteParams,
+  DialogConfig
+} from "../../../../shared";
 import { CustomerFormComponent } from "../customer-form/customer-form.component";
 import { MatDialog } from '@angular/material/dialog';
-import { BaseListComponent } from "../../../../shared";
 
 @Component({
   selector: 'app-customer-list',
@@ -15,7 +22,12 @@ import { BaseListComponent } from "../../../../shared";
   styleUrls: ['./customer-list.component.scss']
 })
 export class CustomerListComponent extends BaseListComponent implements OnInit {
-  readonly displayedColumns = ['firstName', 'lastName', 'addresses', 'actions'];
+  readonly displayedColumns = [
+    TableColumns.CUSTOMER.FIRST_NAME,
+    TableColumns.CUSTOMER.LAST_NAME,
+    TableColumns.CUSTOMER.ADDRESSES,
+    TableColumns.CUSTOMER.ACTIONS
+  ];
   readonly loading$ = this.customerFacade.loading$;
   readonly selectedCustomer$ = this.customerFacade.selectedCustomer$;
   filteredCustomers$!: Observable<Customer[]>;
@@ -38,12 +50,12 @@ export class CustomerListComponent extends BaseListComponent implements OnInit {
   }
 
   openAddCustomerDialog(): void {
-    this.openDialog(CustomerFormComponent, {}, 'Customer added successfully');
+    this.openDialog(CustomerFormComponent, {}, SuccessMessages.CUSTOMER_ADDED);
   }
 
   editCustomer(customer: Customer): void {
     const dialogConfig = { customer, isEdit: true };
-    this.openDialog(CustomerFormComponent, dialogConfig, 'Customer updated successfully');
+    this.openDialog(CustomerFormComponent, dialogConfig, SuccessMessages.CUSTOMER_UPDATED);
   }
 
   deleteCustomer(customer: Customer): void {
@@ -71,14 +83,14 @@ export class CustomerListComponent extends BaseListComponent implements OnInit {
 
   private showDeleteConfirmation(customer: Customer): Observable<boolean> {
     return this.dialogService.confirm({
-      message: 'Are you sure you want to delete this customer?',
+      message: ConfirmMessages.DELETE_CUSTOMER,
       entity: customer
     });
   }
 
   private handleCustomerDeletion(customer: Customer): void {
     this.customerFacade.deleteCustomer(customer.id);
-    this.notificationService.success('Customer deleted successfully');//I need to move notifications into the effects later.
+    this.notificationService.success(SuccessMessages.CUSTOMER_DELETED);//I need to move notifications into the effects later.
   }
 
   private navigateToQuotes(customerId: string): void {
