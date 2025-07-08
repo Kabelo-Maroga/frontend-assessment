@@ -7,14 +7,11 @@ import { QuoteFormComponent } from '../quote-form/quote-form.component';
 import { QuoteFacade } from '../../state/quote.facade';
 import { MatDialog } from '@angular/material/dialog';
 import {
-  BaseListComponent,
-  NotificationService,
   DialogService,
-  SuccessMessages,
   ConfirmMessages,
   TableColumns,
   RouteParams,
-  DialogConfig
+  DialogConfig, SafeUnsubscribe
 } from '../../../../shared';
 
 interface QuoteDialogConfig {
@@ -31,7 +28,7 @@ interface QuoteDialogConfig {
   templateUrl: './quote-list.component.html',
   styleUrls: ['./quote-list.component.scss']
 })
-export class QuoteListComponent extends BaseListComponent implements OnInit {
+export class QuoteListComponent extends SafeUnsubscribe implements OnInit {
   readonly quotesWithCustomers$ = this.quoteFacade.quotesWithCustomers$;
   readonly selectedQuote$ = this.quoteFacade.selectedQuote$;
   readonly statusOptions = ['', QuoteStatus.Pending, QuoteStatus.Approved, QuoteStatus.Declined];
@@ -44,7 +41,7 @@ export class QuoteListComponent extends BaseListComponent implements OnInit {
     TableColumns.QUOTE.ACTIONS
   ];
 
-  filteredQuotes$!: Observable<QuoteWithCustomer[]>;
+  filteredQuotes$?: Observable<QuoteWithCustomer[]>;
 
   private searchSubject$ = new BehaviorSubject<string>('');
   private statusFilterSubject$ = new BehaviorSubject<string>('');
@@ -53,11 +50,10 @@ export class QuoteListComponent extends BaseListComponent implements OnInit {
   constructor(
     private quoteFacade: QuoteFacade,
     private route: ActivatedRoute,
-    dialog: MatDialog,
-    notificationService: NotificationService,
+    private dialog: MatDialog,
     private dialogService: DialogService
   ) {
-    super(dialog, notificationService);
+    super();
     this.initFilteredQuotes();
   }
 
@@ -80,12 +76,12 @@ export class QuoteListComponent extends BaseListComponent implements OnInit {
 
   openAddQuoteDialog(): void {
     const config = this.createDialogConfig();
-    this.openQuoteDialog(config, SuccessMessages.QUOTE_ADDED);
+    this.openQuoteDialog(config);
   }
 
   openEditQuoteDialog(quote: QuoteWithCustomer): void {
     const config = this.createDialogConfig({ quote, isEdit: true });
-    this.openQuoteDialog(config, SuccessMessages.QUOTE_UPDATED);
+    this.openQuoteDialog(config);
   }
 
   deleteQuote(quote: QuoteWithCustomer): void {
@@ -103,8 +99,8 @@ export class QuoteListComponent extends BaseListComponent implements OnInit {
     };
   }
 
-  private openQuoteDialog(config: QuoteDialogConfig, successMessage: string): void {
-    this.openDialog(QuoteFormComponent, config, successMessage);
+  private openQuoteDialog(config: QuoteDialogConfig): void {
+    this.dialog.open(QuoteFormComponent, config);
   }
 
   private showDeleteConfirmation(quote: QuoteWithCustomer): Observable<boolean> {
@@ -116,7 +112,6 @@ export class QuoteListComponent extends BaseListComponent implements OnInit {
 
   private handleQuoteDeletion(quote: QuoteWithCustomer): void {
     this.quoteFacade.deleteQuote(quote.id);
-    this.notificationService.success(SuccessMessages.QUOTE_DELETED);
   }
 
   private subscribeToRouteParams(): void {

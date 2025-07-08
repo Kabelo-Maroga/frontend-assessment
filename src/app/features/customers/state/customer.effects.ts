@@ -2,16 +2,18 @@ import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { CustomerService } from '../services/customer.service';
 import * as CustomerActions from './customer.actions';
-import { catchError, map, of, withLatestFrom, switchMap } from 'rxjs';
+import { catchError, map, of, withLatestFrom, switchMap, tap } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { selectAllCustomers } from './customer.selectors';
+import { NotificationService, SuccessMessages } from '../../../shared';
 
 @Injectable()
 export class CustomerEffects {
   constructor(
     private actions$: Actions,
     private customerService: CustomerService,
-    private store: Store
+    private store: Store,
+    private notificationService: NotificationService
   ) {}
 
   loadCustomers$ = createEffect(() =>
@@ -45,6 +47,14 @@ export class CustomerEffects {
     )
   );
 
+  addCustomerSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(CustomerActions.addCustomerSuccess),
+      tap(() => this.notificationService.success(SuccessMessages.CUSTOMER_ADDED))
+    ),
+    { dispatch: false }
+  );
+
   updateCustomer$ = createEffect(() =>
     this.actions$.pipe(
       ofType(CustomerActions.updateCustomer),
@@ -57,6 +67,14 @@ export class CustomerEffects {
     )
   );
 
+  updateCustomerSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(CustomerActions.updateCustomerSuccess),
+      tap(() => this.notificationService.success(SuccessMessages.CUSTOMER_UPDATED))
+    ),
+    { dispatch: false }
+  );
+
   deleteCustomer$ = createEffect(() =>
     this.actions$.pipe(
       ofType(CustomerActions.deleteCustomer),
@@ -67,5 +85,13 @@ export class CustomerEffects {
         )
       )
     )
+  );
+
+  deleteCustomerSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(CustomerActions.deleteCustomerSuccess),
+      tap(() => this.notificationService.success(SuccessMessages.CUSTOMER_DELETED))
+    ),
+    { dispatch: false }
   );
 }

@@ -3,15 +3,11 @@ import { Router } from '@angular/router';
 import { CustomerFacade } from '../../state/customer.facade';
 import { Customer } from '../../models/customer.model';
 import { BehaviorSubject, combineLatest, map, Observable, takeUntil, filter } from 'rxjs';
-import { 
-  BaseListComponent,
-  DialogService, 
-  NotificationService, 
-  SuccessMessages, 
+import {
+  DialogService,
   ConfirmMessages,
   TableColumns,
-  RouteParams,
-  DialogConfig
+  SafeUnsubscribe,
 } from "../../../../shared";
 import { CustomerFormComponent } from "../customer-form/customer-form.component";
 import { MatDialog } from '@angular/material/dialog';
@@ -21,7 +17,7 @@ import { MatDialog } from '@angular/material/dialog';
   templateUrl: './customer-list.component.html',
   styleUrls: ['./customer-list.component.scss']
 })
-export class CustomerListComponent extends BaseListComponent implements OnInit {
+export class CustomerListComponent extends SafeUnsubscribe implements OnInit {
   readonly displayedColumns = [
     TableColumns.CUSTOMER.FIRST_NAME,
     TableColumns.CUSTOMER.LAST_NAME,
@@ -30,7 +26,7 @@ export class CustomerListComponent extends BaseListComponent implements OnInit {
   ];
   readonly loading$ = this.customerFacade.loading$;
   readonly selectedCustomer$ = this.customerFacade.selectedCustomer$;
-  filteredCustomers$!: Observable<Customer[]>;
+  filteredCustomers$?: Observable<Customer[]>;
 
   private searchSubject$ = new BehaviorSubject<string>('');
 
@@ -38,10 +34,9 @@ export class CustomerListComponent extends BaseListComponent implements OnInit {
     private customerFacade: CustomerFacade,
     private dialogService: DialogService,
     private router: Router,
-    dialog: MatDialog,
-    notificationService: NotificationService
+    private dialog: MatDialog,
   ) {
-    super(dialog, notificationService);
+    super();
   }
 
   ngOnInit(): void {
@@ -50,12 +45,12 @@ export class CustomerListComponent extends BaseListComponent implements OnInit {
   }
 
   openAddCustomerDialog(): void {
-    this.openDialog(CustomerFormComponent, {}, SuccessMessages.CUSTOMER_ADDED);
+    this.dialog.open(CustomerFormComponent, {});
   }
 
   editCustomer(customer: Customer): void {
-    const dialogConfig = { customer, isEdit: true };
-    this.openDialog(CustomerFormComponent, dialogConfig, SuccessMessages.CUSTOMER_UPDATED);
+    const dialogConfig = { data: { customer, isEdit: true } };
+    this.dialog.open(CustomerFormComponent, dialogConfig);
   }
 
   deleteCustomer(customer: Customer): void {
@@ -90,7 +85,6 @@ export class CustomerListComponent extends BaseListComponent implements OnInit {
 
   private handleCustomerDeletion(customer: Customer): void {
     this.customerFacade.deleteCustomer(customer.id);
-    this.notificationService.success(SuccessMessages.CUSTOMER_DELETED);//I need to move notifications into the effects later.
   }
 
   private navigateToQuotes(customerId: string): void {

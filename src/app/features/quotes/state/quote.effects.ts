@@ -2,16 +2,18 @@ import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { QuoteService } from '../services/quote.service';
 import * as QuoteActions from './quote.actions';
-import { catchError, map, mergeMap, of, switchMap, withLatestFrom } from 'rxjs';
+import { catchError, map, mergeMap, of, switchMap, tap, withLatestFrom } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { selectQuotesWithCustomers } from './quote.selectors';
+import { NotificationService, SuccessMessages } from '../../../shared';
 
 @Injectable()
 export class QuoteEffects {
   constructor(
     private actions$: Actions,
     private quoteService: QuoteService,
-    private store: Store
+    private store: Store,
+    private notificationService: NotificationService
   ) {}
 
   loadQuotesWithCustomers$ = createEffect(() =>
@@ -45,6 +47,14 @@ export class QuoteEffects {
     )
   );
 
+  addQuoteSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(QuoteActions.addQuoteSuccess),
+      tap(() => this.notificationService.success(SuccessMessages.QUOTE_ADDED))
+    ),
+    { dispatch: false }
+  );
+
   updateQuote$ = createEffect(() =>
     this.actions$.pipe(
       ofType(QuoteActions.updateQuote),
@@ -57,6 +67,14 @@ export class QuoteEffects {
     )
   );
 
+  updateQuoteSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(QuoteActions.updateQuoteSuccess),
+      tap(() => this.notificationService.success(SuccessMessages.QUOTE_UPDATED))
+    ),
+    { dispatch: false }
+  );
+
   deleteQuote$ = createEffect(() =>
     this.actions$.pipe(
       ofType(QuoteActions.deleteQuote),
@@ -67,5 +85,13 @@ export class QuoteEffects {
         )
       )
     )
+  );
+
+  deleteQuoteSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(QuoteActions.deleteQuoteSuccess),
+      tap(() => this.notificationService.success(SuccessMessages.QUOTE_DELETED))
+    ),
+    { dispatch: false }
   );
 }

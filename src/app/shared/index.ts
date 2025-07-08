@@ -1,7 +1,6 @@
 export * from './components/confirm-dialog/confirm-dialog.component';
 export * from './components/navigation/navigation.component';
 export * from './components/base-form.component';
-export * from './components/base-list.component';
 
 export * from './services/dialog.service';
 export * from './services/notification.service';
