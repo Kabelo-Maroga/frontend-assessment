@@ -6,12 +6,14 @@ export interface QuoteState {
   quotesWithCustomers: QuoteWithCustomer[];
   selectedQuote: QuoteWithCustomer | undefined;
   loading: boolean;
+  error: any;
 }
 
 export const initialState: QuoteState = {
   quotesWithCustomers: [],
   selectedQuote: undefined,
   loading: false,
+  error: null
 };
 
 export const quoteReducer = createReducer(
@@ -31,6 +33,7 @@ export const quoteReducer = createReducer(
   on(QuoteActions.loadQuotesFailure, (state, { error }) => ({
     ...state,
     loading: false,
+    error
   })),
 
   on(QuoteActions.addQuoteSuccess, (state, { quoteWithCustomer }) => ({
@@ -40,6 +43,7 @@ export const quoteReducer = createReducer(
 
   on(QuoteActions.addQuoteFailure, (state, { error }) => ({
     ...state,
+    error
   })),
 
   on(QuoteActions.updateQuoteSuccess, (state, { quoteWithCustomer }) => ({
@@ -49,6 +53,7 @@ export const quoteReducer = createReducer(
 
   on(QuoteActions.updateQuoteFailure, (state, { error }) => ({
     ...state,
+    error
   })),
 
   on(QuoteActions.deleteQuoteSuccess, (state, { id }) => ({

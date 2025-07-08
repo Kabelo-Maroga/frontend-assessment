@@ -23,9 +23,6 @@
         <mat-error *ngIf="form.get('description')?.hasError('required') && form.get('description')?.touched">
           Description is required
         </mat-error>
-        <mat-error *ngIf="form.get('description')?.hasError('minlength') && form.get('description')?.touched">
-          Description must be at least 10 characters long
-        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full-width">
@@ -35,9 +32,6 @@
         <span matPrefix>R&nbsp;</span>
         <mat-error *ngIf="form.get('amount')?.hasError('required') && form.get('amount')?.touched">
           Amount is required
-        </mat-error>
-        <mat-error *ngIf="form.get('amount')?.hasError('min') && form.get('amount')?.touched">
-          Amount must be greater than 0
         </mat-error>
       </mat-form-field>
 

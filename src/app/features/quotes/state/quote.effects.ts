@@ -24,7 +24,7 @@ export class QuoteEffects {
           return of(QuoteActions.loadQuotesSuccess({ quotesWithCustomers }));
         }
 
-        // Otherwise, fetch from service
+        // Otherwise, fetch from server
         return this.quoteService.getQuotesWithCustomers().pipe(
           map((quotesWithCustomers) => QuoteActions.loadQuotesSuccess({ quotesWithCustomers })),
           catchError((error) => of(QuoteActions.loadQuotesFailure({ error })))
@@ -36,7 +36,7 @@ export class QuoteEffects {
   addQuote$ = createEffect(() =>
     this.actions$.pipe(
       ofType(QuoteActions.addQuote),
-      mergeMap(({ quoteWithCustomer }) =>
+      switchMap(({ quoteWithCustomer }) =>
         this.quoteService.addQuote(quoteWithCustomer).pipe(
           map((newQuote) => QuoteActions.addQuoteSuccess({ quoteWithCustomer: newQuote })),
           catchError((error) => of(QuoteActions.addQuoteFailure({ error })))
@@ -48,7 +48,7 @@ export class QuoteEffects {
   updateQuote$ = createEffect(() =>
     this.actions$.pipe(
       ofType(QuoteActions.updateQuote),
-      mergeMap(({ quoteWithCustomer }) =>
+      switchMap(({ quoteWithCustomer }) =>
         this.quoteService.updateQuote(quoteWithCustomer).pipe(
           map((updatedQuote) => QuoteActions.updateQuoteSuccess({ quoteWithCustomer: updatedQuote })),
           catchError((error) => of(QuoteActions.updateQuoteFailure({ error })))
@@ -60,7 +60,7 @@ export class QuoteEffects {
   deleteQuote$ = createEffect(() =>
     this.actions$.pipe(
       ofType(QuoteActions.deleteQuote),
-      mergeMap(({ id }) =>
+      switchMap(({ id }) =>
         this.quoteService.deleteQuote(id).pipe(
           map((deletedId) => QuoteActions.deleteQuoteSuccess({ id: deletedId })),
           catchError((error) => of(QuoteActions.deleteQuoteFailure({ error })))

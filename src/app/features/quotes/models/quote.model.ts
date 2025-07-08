@@ -7,6 +7,7 @@ export interface Quote {
   description: string;
 }
 
+//This needs to be refactored. Can probably do with only Quote!
 export interface QuoteWithCustomer extends Quote {
   customerFullName: string;
   customer?: any;

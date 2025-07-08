@@ -18,11 +18,12 @@ export interface QuoteDialogData {
   styleUrls: ['./quote-form.component.scss']
 })
 export class QuoteFormComponent extends BaseFormComponent implements OnInit {
+  readonly customers$ = this.quoteFacade.customers$;
+  readonly statusOptions = ['Pending', 'Approved', 'Declined'];
+  readonly currentQuote?: QuoteWithCustomer;
+
   form: FormGroup;
-  customers$ = this.quoteFacade.customers$;
-  statusOptions = ['Pending', 'Approved', 'Declined'];
   isEditMode = false;
-  currentQuote?: QuoteWithCustomer;
   selectedCustomer?: Customer;
 
   constructor(
@@ -66,7 +67,6 @@ export class QuoteFormComponent extends BaseFormComponent implements OnInit {
   }
 
   onSelectionChange(customer: Customer): void {
-    console.log("customer --- ", customer);
     this.selectedCustomer = customer;
   }
 

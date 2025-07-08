@@ -14,11 +14,12 @@ import { BaseListComponent, NotificationService } from '../../../../shared';
   styleUrls: ['./quote-list.component.scss']
 })
 export class QuoteListComponent extends BaseListComponent implements OnInit {
-  quotesWithCustomers$ = this.quoteFacade.quotesWithCustomers$;
+  readonly quotesWithCustomers$ = this.quoteFacade.quotesWithCustomers$;
+  readonly selectedQuote$ = this.quoteFacade.selectedQuote$;
+  readonly displayedColumns = ['customerFullName', 'description', 'amount', 'status', 'createdDate', 'actions'];
+  readonly statusOptions = ['', 'Pending', 'Approved', 'Declined'];
+
   filteredQuotes$!: Observable<QuoteWithCustomer[]>;
-  selectedQuote$ = this.quoteFacade.selectedQuote$;
-  displayedColumns = ['customerFullName', 'description', 'amount', 'status', 'createdDate', 'actions'];
-  statusOptions = ['', 'Pending', 'Approved', 'Declined'];
 
   private searchSubject$ = new BehaviorSubject<string>('');
   private statusFilterSubject$ = new BehaviorSubject<string>('');
@@ -31,11 +32,11 @@ export class QuoteListComponent extends BaseListComponent implements OnInit {
     notificationService: NotificationService
   ) {
     super(dialog, notificationService);
-    this.setupFiltering();
+    this.initFilteredQuotes();
   }
 
   ngOnInit(): void {
-    this.quoteFacade.loadQuotesWithCustomers();
+    this.quoteFacade.loadQuotes();
     this.handleRouteParams();
   }
 
@@ -79,11 +80,11 @@ export class QuoteListComponent extends BaseListComponent implements OnInit {
       .pipe(takeUntil(this._ngUnsubscribe))
       .subscribe(params => {
       this.selectedCustomerId = params['customerId'] || null;
-      this.setupFiltering();
+      this.initFilteredQuotes();
     });
   }
 
-  private setupFiltering(): void {
+  private initFilteredQuotes(): void {
     this.filteredQuotes$ = combineLatest([
       this.quotesWithCustomers$,
       this.searchSubject$,
