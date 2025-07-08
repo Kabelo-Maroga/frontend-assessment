@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Observable, BehaviorSubject, combineLatest, takeUntil, filter } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
@@ -6,6 +6,8 @@ import { QuoteWithCustomer, QuoteStatus } from '../../models/quote.model';
 import { QuoteFormComponent } from '../quote-form/quote-form.component';
 import { QuoteFacade } from '../../state/quote.facade';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import {
   DialogService,
   ConfirmMessages,
@@ -42,6 +44,9 @@ export class QuoteListComponent extends SafeUnsubscribe implements OnInit {
   ];
 
   filteredQuotes$?: Observable<QuoteWithCustomer[]>;
+  dataSource = new MatTableDataSource<QuoteWithCustomer>([]);
+
+  @ViewChild(MatSort) sort!: MatSort;
 
   private searchSubject$ = new BehaviorSubject<string>('');
   private statusFilterSubject$ = new BehaviorSubject<string>('');
@@ -60,6 +65,7 @@ export class QuoteListComponent extends SafeUnsubscribe implements OnInit {
   ngOnInit(): void {
     this.quoteFacade.loadQuotes();
     this.subscribeToRouteParams();
+    this.initGridDataSource();
   }
 
   onSearch(value: string): void {
@@ -162,5 +168,16 @@ export class QuoteListComponent extends SafeUnsubscribe implements OnInit {
 
   private filterByStatus(quote: QuoteWithCustomer, statusFilter: string): boolean {
     return !statusFilter || quote.status === statusFilter as QuoteStatus;
+  }
+
+  private initGridDataSource(): void {
+    this.filteredQuotes$?.pipe(
+      takeUntil(this._ngUnsubscribe)
+    ).subscribe(quotes => {
+      this.dataSource.data = quotes || [];
+      if (this.sort) {
+        this.dataSource.sort = this.sort;
+      }
+    });
   }
 }

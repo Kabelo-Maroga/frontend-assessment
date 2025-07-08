@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { CustomerFacade } from '../../state/customer.facade';
 import { Customer } from '../../models/customer.model';
@@ -9,6 +9,8 @@ import {
   TableColumns,
   SafeUnsubscribe,
 } from "../../../../shared";
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { CustomerFormComponent } from "../customer-form/customer-form.component";
 import { MatDialog } from '@angular/material/dialog';
 
@@ -27,6 +29,9 @@ export class CustomerListComponent extends SafeUnsubscribe implements OnInit {
   readonly loading$ = this.customerFacade.loading$;
   readonly selectedCustomer$ = this.customerFacade.selectedCustomer$;
   filteredCustomers$?: Observable<Customer[]>;
+  dataSource = new MatTableDataSource<Customer>([]);
+
+  @ViewChild(MatSort) sort!: MatSort;
 
   private searchSubject$ = new BehaviorSubject<string>('');
 
@@ -42,6 +47,7 @@ export class CustomerListComponent extends SafeUnsubscribe implements OnInit {
   ngOnInit(): void {
     this.customerFacade.loadCustomers();
     this.filteredCustomers$ = this.initFilteredCustomers$();
+    this.initGridDataSource();
   }
 
   openAddCustomerDialog(): void {
@@ -115,5 +121,16 @@ export class CustomerListComponent extends SafeUnsubscribe implements OnInit {
 
   private isMatchingName(name: string, searchKey: string): boolean {
     return name.toLowerCase().includes(searchKey);
+  }
+
+  private initGridDataSource(): void {
+    this.filteredCustomers$?.pipe(
+      takeUntil(this._ngUnsubscribe)
+    ).subscribe(customers => {
+      this.dataSource.data = customers;
+      if (this.sort) {
+        this.dataSource.sort = this.sort;
+      }
+    });
   }
 }

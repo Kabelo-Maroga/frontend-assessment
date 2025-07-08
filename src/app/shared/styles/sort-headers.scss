@@ -1,0 +1,52 @@
+// Shared styles for sort headers to be used across the application
+
+// Make sort headers more prominent
+.sortable-table {
+  .mat-sort-header-container {
+    align-items: center;
+    
+    // Always show the sort arrow with some opacity
+    .mat-sort-header-arrow {
+      opacity: 0.5;
+      color: rgba(0, 0, 0, 0.54);
+      margin-left: 5px;
+      transform: translateY(0) !important;
+    }
+  }
+  
+  // Add a visual indicator to sortable columns
+  th.mat-header-cell.mat-sort-header {
+    position: relative;
+    cursor: pointer;
+    
+    // Show a subtle up/down arrow indicator
+    &:after {
+      content: "↕";
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      transform: translateY(-50%);
+      opacity: 0.3;
+      font-size: 14px;
+    }
+    
+    // Hide the custom indicator when sorting is active (native indicator will show)
+    &.mat-sort-header-sorted:after {
+      display: none;
+    }
+    
+    // Highlight on hover
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+      
+      &:after {
+        opacity: 0.7;
+      }
+    }
+  }
+  
+  // Highlight the active sort column header
+  .mat-sort-header-sorted {
+    color: #3f51b5; // Primary color
+  }
+}
